@@ -12,9 +12,9 @@ export const columns: ColumnDef<Reservation>[] = [
         header: "Guest",
     },
     {
-        accessorKey: "properties.building_name",
+        accessorKey: "properties.name",
         header: "Property",
-        cell: ({ row }) => row.original.properties?.building_name || "Unknown"
+        cell: ({ row }) => row.original.properties?.name || row.original.properties?.internal_code || "Unknown"
     },
     {
         accessorKey: "check_in_date",

@@ -1,12 +1,21 @@
 import type { Metadata } from "next";
-import { Inter, JetBrains_Mono } from "next/font/google";
+import { Poppins, Open_Sans, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import { cn } from "@/lib/utils";
 
 import { Toaster } from "@/components/ui/toaster";
 
-const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
+const poppins = Poppins({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-heading"
+});
+const openSans = Open_Sans({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+  variable: "--font-body"
+});
 const jetbrainsMono = JetBrains_Mono({
   subsets: ["latin"],
   variable: "--font-mono"
@@ -25,8 +34,9 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={cn(
-        "min-h-screen bg-background font-sans antialiased",
-        inter.variable,
+        "min-h-screen bg-background font-body antialiased",
+        poppins.variable,
+        openSans.variable,
         jetbrainsMono.variable
       )}>
         <ThemeProvider

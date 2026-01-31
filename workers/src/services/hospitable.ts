@@ -151,7 +151,7 @@ export class HospitableService {
         const queryParams = new URLSearchParams()
         if (params?.from) queryParams.set('arrival_from', params.from)
         if (params?.to) queryParams.set('arrival_to', params.to)
-        if (params?.property_id) queryParams.set('property_id', params.property_id)
+        if (params?.property_id) queryParams.set('properties[]', params.property_id)
 
         const query = queryParams.toString()
         const endpoint = `/reservations${query ? `?${query}` : ''}`

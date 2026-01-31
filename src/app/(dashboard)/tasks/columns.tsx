@@ -12,9 +12,9 @@ export const columns: ColumnDef<Task>[] = [
         cell: ({ row }) => <span className="font-medium">{row.original.title}</span>
     },
     {
-        accessorKey: "properties.building_name",
+        accessorKey: "properties.name",
         header: "Property",
-        cell: ({ row }) => row.original.properties?.building_name || "General"
+        cell: ({ row }) => row.original.properties?.name || row.original.properties?.internal_code || "General"
     },
     {
         accessorKey: "priority",

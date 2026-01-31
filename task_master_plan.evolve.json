@@ -1,681 +1,675 @@
 {
-  "schema_version": "1.0",
+  "schema_version": "2.0",
   "project": {
-    "name": "Co.Property Operations Dashboard",
+    "name": "Co.Property Operations Dashboard - Professional UI/UX Upgrade",
     "repo_root": "/Volumes/madara/2026/Coproperty/dashboard-0.1",
     "generated_on": "2026-01-29",
-    "generated_by": "task-master-planner",
+    "generated_by": "task-master-planner + ui-ux-pro-max",
+    "upgrade_objective": "Transform barebone template into professional property management SaaS dashboard with modern data visualizations, micro-interactions, and production-ready UI/UX",
+    "design_system": {
+      "style": "Glassmorphism + Modern Gradient (Aurora UI)",
+      "typography": {
+        "heading": "Poppins",
+        "body": "Open Sans",
+        "import": "@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap');"
+      },
+      "colors": {
+        "primary": "#0F766E",
+        "secondary": "#14B8A6",
+        "cta": "#0369A1",
+        "background": "#F0FDFA",
+        "text": "#134E4A",
+        "border": "#99F6E4",
+        "gradients": {
+          "aurora_blue": "linear-gradient(135deg, #0080FF 0%, #00FFFF 100%)",
+          "aurora_purple": "linear-gradient(135deg, #6366F1 0%, #EC4899 100%)",
+          "glass_overlay": "rgba(255,255,255,0.1)"
+        }
+      },
+      "effects": {
+        "glass": "backdrop-blur-xl bg-white/10 border border-white/20",
+        "shadow": "shadow-xl shadow-primary/5",
+        "transition": "transition-all duration-300 ease-out"
+      }
+    },
     "assumptions": [
-      "Cloudflare Workers and KV namespaces are available",
-      "Hospitable API access token is provided and valid",
-      "Turno API credentials are provided and valid",
-      "Frontend fetches data via Workers API endpoints",
-      "Simple API key authentication for initial version",
-      "DesignSpec.md is the source of truth for UI layouts and components",
-      "Engineering team uses Bun, Next.js 14 App Router, Tailwind, Zustand, React Query"
-    ],
-    "risks": [
-      "External API rate limits may require caching strategies",
-      "Hospitable/Turno API schema changes may break integrations",
-      "Workers KV eventual consistency may cause stale data in edge cases",
-      "No persistent database means no historical analytics without external storage"
+      "Recharts library for data visualizations",
+      "Framer Motion for micro-interactions",
+      "Lucide React for consistent icons",
+      "Real data from Hospitable/Turno APIs",
+      "Mobile-first responsive design",
+      "Light and dark mode support",
+      "WCAG 2.1 AA compliance"
     ]
   },
   "phases": [
     {
-      "phase_id": "P0",
-      "name": "Foundation & Architecture",
-      "status": "completed",
-      "objective": "Establish project scaffolding, architecture alignment, and platform readiness.",
+      "phase_id": "P6",
+      "name": "Design System & Foundation",
       "sprints": [
         {
-          "sprint_id": "S1",
-          "duration_weeks": 1,
-          "focus": "Repo setup, architecture alignment, and platform foundations",
+          "sprint_id": "S8",
           "tasks": [
             {
-              "id": "P0-S1-01",
-              "title": "Confirm requirements and scope against DesignSpec and ProjectArchitecture",
-              "area": "product",
-              "owner_role": "Tech Lead",
-              "est_hours": 4,
-              "dependencies": [],
-              "deliverable": "Scope confirmation notes and feature checklist",
-              "acceptance": "Checklist maps every major feature to a sprint"
+              "id": "P6-S8-01",
+              "title": "Install design system dependencies (Recharts, Framer Motion, Lucide)",
+              "est_hours": 2
             },
             {
-              "id": "P0-S1-02",
-              "title": "Define codebase module boundaries and folder structure",
-              "area": "backend",
-              "owner_role": "Backend Eng",
-              "est_hours": 4,
-              "dependencies": [
-                "P0-S1-01"
-              ],
-              "deliverable": "Documented package/layout structure aligned with architecture patterns",
-              "acceptance": "Structure supports Workers API, frontend services, and UI separation"
+              "id": "P6-S8-02",
+              "title": "Update Tailwind config with Poppins/Open Sans fonts",
+              "est_hours": 3
             },
             {
-              "id": "P0-S1-03",
-              "title": "Configure Tailwind tokens from DesignSpec",
-              "area": "frontend",
-              "owner_role": "Frontend Eng",
-              "est_hours": 4,
-              "dependencies": [
-                "P0-S1-01"
-              ],
-              "deliverable": "Tailwind config with colors, typography, spacing, shadows",
-              "acceptance": "Tokens map to DesignSpec sections 2.x"
+              "id": "P6-S8-03",
+              "title": "Create glass morphism utility classes",
+              "est_hours": 2
             },
             {
-              "id": "P0-S1-04",
-              "title": "Establish base Next.js App Router layout structure",
-              "area": "frontend",
-              "owner_role": "Frontend Eng",
-              "est_hours": 4,
-              "dependencies": [
-                "P0-S1-03"
-              ],
-              "deliverable": "Root layout with app shell placeholders",
-              "acceptance": "Layout renders sidebar/header slots"
+              "id": "P6-S8-04",
+              "title": "Implement gradient background system with Aurora effects",
+              "est_hours": 3
             },
             {
-              "id": "P0-S1-05",
-              "title": "Establish linting, formatting, and basic CI pipeline",
-              "area": "infra",
-              "owner_role": "DevOps",
-              "est_hours": 4,
-              "dependencies": [
-                "P0-S1-01"
-              ],
-              "deliverable": "CI workflow running lint and tests on PRs",
-              "acceptance": "CI fails on lint/test violations"
+              "id": "P6-S8-05",
+              "title": "Create light/dark mode theme provider with toggle",
+              "est_hours": 4
+            },
+            {
+              "id": "P6-S8-06",
+              "title": "Build base UI component library (Button, Card, Badge, Input)",
+              "est_hours": 8
+            },
+            {
+              "id": "P6-S8-07",
+              "title": "Create animated stat card component with sparklines",
+              "est_hours": 4
+            },
+            {
+              "id": "P6-S8-08",
+              "title": "Build chart wrapper components with themed Recharts",
+              "est_hours": 4
             }
           ]
         }
       ]
     },
     {
-      "phase_id": "P1",
-      "name": "Cloudflare Workers & API Integrations",
-      "status": "in_progress",
-      "objective": "Build Cloudflare Workers backend with Hospitable and Turno API integrations.",
+      "phase_id": "P7",
+      "name": "Enhanced Dashboard Page",
       "sprints": [
         {
-          "sprint_id": "S2",
-          "duration_weeks": 2,
-          "focus": "Workers setup, API clients, and caching layer",
+          "sprint_id": "S9",
           "tasks": [
             {
-              "id": "P1-S2-01",
-              "title": "Initialize Cloudflare Workers project with Hono",
-              "area": "backend",
-              "owner_role": "Backend Eng",
-              "est_hours": 6,
-              "dependencies": [
-                "P0-S1-02"
-              ],
-              "deliverable": "workers/ directory with wrangler.toml, Hono router skeleton",
-              "acceptance": "Worker deploys and returns hello world at /health"
+              "id": "P7-S9-01",
+              "title": "Design responsive dashboard grid layout system",
+              "est_hours": 3
             },
             {
-              "id": "P1-S2-02",
-              "title": "Configure Workers KV namespaces for caching",
-              "area": "infra",
-              "owner_role": "DevOps",
-              "est_hours": 4,
-              "dependencies": [
-                "P1-S2-01"
-              ],
-              "deliverable": "KV namespace bindings in wrangler.toml",
-              "acceptance": "Workers can read/write to KV"
+              "id": "P7-S9-02",
+              "title": "Implement KPI stat cards with trend indicators and MoM comparison",
+              "est_hours": 6
             },
             {
-              "id": "P1-S2-03",
-              "title": "Implement Hospitable API client with rate limiting",
-              "area": "backend",
-              "owner_role": "Backend Eng",
-              "est_hours": 8,
-              "dependencies": [
-                "P1-S2-01"
-              ],
-              "deliverable": "TypeScript client for Hospitable v2 API",
-              "acceptance": "Client fetches properties and reservations successfully"
+              "id": "P7-S9-03",
+              "title": "Build occupancy rate 30-day area chart with tooltips",
+              "est_hours": 5
             },
             {
-              "id": "P1-S2-04",
-              "title": "Implement Turno API client",
-              "area": "backend",
-              "owner_role": "Backend Eng",
-              "est_hours": 8,
-              "dependencies": [
-                "P1-S2-01"
-              ],
-              "deliverable": "TypeScript client for Turno API",
-              "acceptance": "Client fetches cleaning jobs and updates status"
+              "id": "P7-S9-04",
+              "title": "Create revenue vs payout multi-line chart with date range picker",
+              "est_hours": 5
             },
             {
-              "id": "P1-S2-05",
-              "title": "Implement caching layer with KV",
-              "area": "backend",
-              "owner_role": "Backend Eng",
-              "est_hours": 6,
-              "dependencies": [
-                "P1-S2-02",
-                "P1-S2-03"
-              ],
-              "deliverable": "Cache wrapper with TTL support",
-              "acceptance": "API responses cached, invalidation works"
+              "id": "P7-S9-05",
+              "title": "Implement booking source distribution pie chart (Airbnb/Booking/Direct)",
+              "est_hours": 4
             },
             {
-              "id": "P1-S2-06",
-              "title": "Build /api/properties endpoint",
-              "area": "backend",
-              "owner_role": "Backend Eng",
-              "est_hours": 6,
-              "dependencies": [
-                "P1-S2-03",
-                "P1-S2-05"
-              ],
-              "deliverable": "GET /api/properties with filtering and pagination",
-              "acceptance": "Returns properties from Hospitable via cache"
+              "id": "P7-S9-06",
+              "title": "Build property performance comparison bar chart (top 5 by revenue)",
+              "est_hours": 5
             },
             {
-              "id": "P1-S2-07",
-              "title": "Build /api/reservations endpoint",
-              "area": "backend",
-              "owner_role": "Backend Eng",
-              "est_hours": 6,
-              "dependencies": [
-                "P1-S2-03",
-                "P1-S2-05"
-              ],
-              "deliverable": "GET /api/reservations with date filters",
-              "acceptance": "Returns reservations from Hospitable via cache"
+              "id": "P7-S9-07",
+              "title": "Create real-time activity feed with property images and timestamps",
+              "est_hours": 6
             },
             {
-              "id": "P1-S2-08",
-              "title": "Build /api/cleaning endpoint",
-              "area": "backend",
-              "owner_role": "Backend Eng",
-              "est_hours": 6,
-              "dependencies": [
-                "P1-S2-04",
-                "P1-S2-05"
-              ],
-              "deliverable": "GET/PATCH /api/cleaning for jobs",
-              "acceptance": "Returns cleaning jobs from Turno, status updates work"
+              "id": "P7-S9-08",
+              "title": "Implement upcoming check-ins timeline (next 7 days)",
+              "est_hours": 5
             },
             {
-              "id": "P1-S2-09",
-              "title": "Build /api/tasks endpoint with KV storage",
-              "area": "backend",
-              "owner_role": "Backend Eng",
-              "est_hours": 8,
-              "dependencies": [
-                "P1-S2-02"
-              ],
-              "deliverable": "CRUD endpoints for tasks stored in KV",
-              "acceptance": "Tasks persist in KV, CRUD works"
+              "id": "P7-S9-09",
+              "title": "Build cleaning schedule mini-board with status indicators",
+              "est_hours": 5
             },
             {
-              "id": "P1-S2-10",
-              "title": "Build /api/dashboard aggregation endpoint",
-              "area": "backend",
-              "owner_role": "Backend Eng",
-              "est_hours": 6,
-              "dependencies": [
-                "P1-S2-06",
-                "P1-S2-07",
-                "P1-S2-08",
-                "P1-S2-09"
-              ],
-              "deliverable": "GET /api/dashboard with stats",
-              "acceptance": "Returns aggregated counts for dashboard"
+              "id": "P7-S9-10",
+              "title": "Create task priority matrix widget (urgent/high/medium/low)",
+              "est_hours": 4
             },
             {
-              "id": "P1-S2-11",
-              "title": "Implement API key authentication middleware",
-              "area": "backend",
-              "owner_role": "Backend Eng",
-              "est_hours": 4,
-              "dependencies": [
-                "P1-S2-01"
-              ],
-              "deliverable": "Auth middleware checking API key header",
-              "acceptance": "Requests without valid API key return 401"
+              "id": "P7-S9-11",
+              "title": "Implement dismissible alert notifications banner",
+              "est_hours": 4
             },
             {
-              "id": "P1-S2-12",
-              "title": "Add request validation and error handling",
-              "area": "backend",
-              "owner_role": "Backend Eng",
-              "est_hours": 4,
-              "dependencies": [
-                "P1-S2-01"
-              ],
-              "deliverable": "Validation middleware and error mapper",
-              "acceptance": "All endpoints return consistent error format"
+              "id": "P7-S9-12",
+              "title": "Add dashboard auto-refresh every 5 minutes with manual button",
+              "est_hours": 3
             }
           ]
         }
       ]
     },
     {
-      "phase_id": "P2",
-      "name": "Frontend Integration",
-      "status": "pending",
-      "objective": "Connect frontend to Workers API and remove legacy code.",
+      "phase_id": "P8",
+      "name": "Enhanced Properties Page",
       "sprints": [
         {
-          "sprint_id": "S3",
-          "duration_weeks": 1,
-          "focus": "API client updates and data layer refactoring",
+          "sprint_id": "S10",
           "tasks": [
             {
-              "id": "P2-S3-01",
-              "title": "Create Workers API client for frontend",
-              "area": "frontend",
-              "owner_role": "Frontend Eng",
-              "est_hours": 6,
-              "dependencies": [
-                "P1-S2-10"
-              ],
-              "deliverable": "Typed API client calling Workers endpoints",
-              "acceptance": "Client supports auth headers and error mapping"
+              "id": "P8-S10-01",
+              "title": "Add advanced filtering panel (status, type, location, bedrooms)",
+              "est_hours": 5
             },
             {
-              "id": "P2-S3-02",
-              "title": "Update properties data layer",
-              "area": "frontend",
-              "owner_role": "Frontend Eng",
-              "est_hours": 4,
-              "dependencies": [
-                "P2-S3-01"
-              ],
-              "deliverable": "Properties fetching via Workers API",
-              "acceptance": "getProperties() returns data from Workers"
+              "id": "P8-S10-02",
+              "title": "Implement table/cards/grid view toggle with persistent preference",
+              "est_hours": 4
             },
             {
-              "id": "P2-S3-03",
-              "title": "Update reservations data layer",
-              "area": "frontend",
-              "owner_role": "Frontend Eng",
-              "est_hours": 4,
-              "dependencies": [
-                "P2-S3-01"
-              ],
-              "deliverable": "Reservations fetching via Workers API",
-              "acceptance": "getReservations() returns data from Workers"
+              "id": "P8-S10-03",
+              "title": "Create property card with glass effect, image, key metrics",
+              "est_hours": 5
             },
             {
-              "id": "P2-S3-04",
-              "title": "Update cleaning jobs data layer",
-              "area": "frontend",
-              "owner_role": "Frontend Eng",
-              "est_hours": 4,
-              "dependencies": [
-                "P2-S3-01"
-              ],
-              "deliverable": "Cleaning fetching via Workers API",
-              "acceptance": "getCleaningJobs() returns data from Workers"
+              "id": "P8-S10-04",
+              "title": "Add property performance mini sparklines (30-day trends)",
+              "est_hours": 4
             },
             {
-              "id": "P2-S3-05",
-              "title": "Update tasks data layer",
-              "area": "frontend",
-              "owner_role": "Frontend Eng",
-              "est_hours": 4,
-              "dependencies": [
-                "P2-S3-01"
-              ],
-              "deliverable": "Tasks CRUD via Workers API",
-              "acceptance": "Task operations work through Workers"
+              "id": "P8-S10-05",
+              "title": "Implement quick actions dropdown per property",
+              "est_hours": 3
             },
             {
-              "id": "P2-S3-06",
-              "title": "Update dashboard data layer",
-              "area": "frontend",
-              "owner_role": "Frontend Eng",
-              "est_hours": 4,
-              "dependencies": [
-                "P2-S3-01"
-              ],
-              "deliverable": "Dashboard stats from Workers API",
-              "acceptance": "getDashboardStats() returns aggregated data"
+              "id": "P8-S10-06",
+              "title": "Add property search with autocomplete suggestions",
+              "est_hours": 4
             },
             {
-              "id": "P2-S3-07",
-              "title": "Update middleware for new auth approach",
-              "area": "frontend",
-              "owner_role": "Frontend Eng",
-              "est_hours": 4,
-              "dependencies": [
-                "P1-S2-11"
-              ],
-              "deliverable": "Middleware using API key or session",
-              "acceptance": "Protected routes work with new auth"
+              "id": "P8-S10-07",
+              "title": "Build property comparison modal (2-3 properties side-by-side)",
+              "est_hours": 6
             },
             {
-              "id": "P2-S3-08",
-              "title": "Remove legacy Supabase references",
-              "area": "frontend",
-              "owner_role": "Frontend Eng",
-              "est_hours": 4,
-              "dependencies": [
-                "P2-S3-06"
-              ],
-              "deliverable": "Codebase free of Supabase imports",
-              "acceptance": "No Supabase references in src/"
+              "id": "P8-S10-08",
+              "title": "Add bulk actions toolbar (multi-select, bulk status change)",
+              "est_hours": 4
             }
           ]
         }
       ]
     },
     {
-      "phase_id": "P3",
-      "name": "Frontend & UX",
-      "status": "completed",
-      "objective": "Deliver UI foundation and all feature pages per DesignSpec.",
+      "phase_id": "P9",
+      "name": "Property Detail Page",
       "sprints": [
         {
-          "sprint_id": "S4",
-          "duration_weeks": 2,
-          "focus": "Frontend foundation, shared components, and auth",
+          "sprint_id": "S11",
           "tasks": [
             {
-              "id": "P3-S4-01",
-              "title": "Implement app shell with sidebar and header navigation",
-              "area": "frontend",
-              "owner_role": "Frontend Eng",
-              "est_hours": 8,
-              "dependencies": [
-                "P0-S1-04"
-              ],
-              "deliverable": "Responsive app shell with navigation slots",
-              "acceptance": "Sidebar items reflect DesignSpec nav structure"
+              "id": "P9-S11-01",
+              "title": "Design property detail page layout with hero and tabs",
+              "est_hours": 3
             },
             {
-              "id": "P3-S4-02",
-              "title": "Wire API client with React Query",
-              "area": "frontend",
-              "owner_role": "Frontend Eng",
-              "est_hours": 6,
-              "dependencies": [
-                "P2-S3-01"
-              ],
-              "deliverable": "Query/mutation setup with caching defaults",
-              "acceptance": "Queries share standardized error handling"
+              "id": "P9-S11-02",
+              "title": "Build property hero section with image gallery lightbox",
+              "est_hours": 6
             },
             {
-              "id": "P3-S4-03",
-              "title": "Implement global UI state with Zustand",
-              "area": "frontend",
-              "owner_role": "Frontend Eng",
-              "est_hours": 4,
-              "dependencies": [
-                "P0-S1-04"
-              ],
-              "deliverable": "Stores for filters, modals, and UI state",
-              "acceptance": "State shared across pages without prop drilling"
+              "id": "P9-S11-03",
+              "title": "Create property info cards grid (capacity, amenities, pricing)",
+              "est_hours": 4
             },
             {
-              "id": "P3-S4-04",
-              "title": "Build button, input, select, and form components",
-              "area": "frontend",
-              "owner_role": "Frontend Eng",
-              "est_hours": 8,
-              "dependencies": [
-                "P0-S1-03"
-              ],
-              "deliverable": "Reusable form components with variants",
-              "acceptance": "Components match DesignSpec and UI patterns"
+              "id": "P9-S11-04",
+              "title": "Implement monthly reservation calendar with color coding",
+              "est_hours": 8
             },
             {
-              "id": "P3-S4-05",
-              "title": "Build data table and list components",
-              "area": "frontend",
-              "owner_role": "Frontend Eng",
-              "est_hours": 8,
-              "dependencies": [
-                "P3-S4-04"
-              ],
-              "deliverable": "Data table with sorting and pagination UI",
-              "acceptance": "Tables support empty/loading states"
+              "id": "P9-S11-05",
+              "title": "Build reservation list timeline (upcoming/past)",
+              "est_hours": 5
             },
             {
-              "id": "P3-S4-06",
-              "title": "Build card, badge, and stat components",
-              "area": "frontend",
-              "owner_role": "Frontend Eng",
-              "est_hours": 6,
-              "dependencies": [
-                "P3-S4-04"
-              ],
-              "deliverable": "Cards and badges for dashboard and boards",
-              "acceptance": "Components match DesignSpec tokens"
+              "id": "P9-S11-06",
+              "title": "Create revenue analytics tab (monthly, YTD, platform breakdown)",
+              "est_hours": 6
             },
             {
-              "id": "P3-S4-07",
-              "title": "Implement modal and dialog system",
-              "area": "frontend",
-              "owner_role": "Frontend Eng",
-              "est_hours": 6,
-              "dependencies": [
-                "P3-S4-04"
-              ],
-              "deliverable": "Modal framework with accessibility support",
-              "acceptance": "Focus trap and ESC to close are supported"
+              "id": "P9-S11-07",
+              "title": "Implement occupancy analytics tab with stay duration stats",
+              "est_hours": 5
             },
             {
-              "id": "P3-S4-08",
-              "title": "Add toast and notification UI pattern",
-              "area": "frontend",
-              "owner_role": "Frontend Eng",
-              "est_hours": 4,
-              "dependencies": [
-                "P3-S4-04"
-              ],
-              "deliverable": "Toast system for success/error messages",
-              "acceptance": "Notifications appear on mutation results"
-            }
-          ]
-        },
-        {
-          "sprint_id": "S5",
-          "duration_weeks": 2,
-          "focus": "Feature pages per DesignSpec",
-          "tasks": [
-            {
-              "id": "P3-S5-01",
-              "title": "Implement Dashboard Home page",
-              "area": "frontend",
-              "owner_role": "Frontend Eng",
-              "est_hours": 10,
-              "dependencies": [
-                "P3-S4-05",
-                "P2-S3-06"
-              ],
-              "deliverable": "Dashboard page with stats, operations, cleaning board, tasks",
-              "acceptance": "Dashboard matches DesignSpec 4.1 layout"
+              "id": "P9-S11-08",
+              "title": "Build cleaning history section with photos and issues",
+              "est_hours": 4
             },
             {
-              "id": "P3-S5-02",
-              "title": "Implement Properties list page with filters",
-              "area": "frontend",
-              "owner_role": "Frontend Eng",
-              "est_hours": 8,
-              "dependencies": [
-                "P2-S3-02",
-                "P3-S4-05"
-              ],
-              "deliverable": "Properties list with search and filter controls",
-              "acceptance": "Filters update query results and pagination"
+              "id": "P9-S11-09",
+              "title": "Create task history section for property-specific tasks",
+              "est_hours": 4
             },
             {
-              "id": "P3-S5-03",
-              "title": "Implement Reservations page",
-              "area": "frontend",
-              "owner_role": "Frontend Eng",
-              "est_hours": 8,
-              "dependencies": [
-                "P2-S3-03",
-                "P3-S4-05"
-              ],
-              "deliverable": "Reservations calendar and list view",
-              "acceptance": "Date navigation and filters work"
-            },
-            {
-              "id": "P3-S5-04",
-              "title": "Implement Cleaning Board page",
-              "area": "frontend",
-              "owner_role": "Frontend Eng",
-              "est_hours": 8,
-              "dependencies": [
-                "P2-S3-04",
-                "P3-S4-06"
-              ],
-              "deliverable": "Kanban-style cleaning board",
-              "acceptance": "Status transitions work with drag/drop"
-            },
-            {
-              "id": "P3-S5-05",
-              "title": "Implement Tasks page",
-              "area": "frontend",
-              "owner_role": "Frontend Eng",
-              "est_hours": 8,
-              "dependencies": [
-                "P2-S3-05",
-                "P3-S4-05"
-              ],
-              "deliverable": "Tasks list with CRUD actions",
-              "acceptance": "Create, edit, complete, delete work"
+              "id": "P9-S11-10",
+              "title": "Add property notes and custom alerts editing",
+              "est_hours": 4
             }
           ]
         }
       ]
     },
     {
-      "phase_id": "P4",
-      "name": "Testing & Verification",
-      "status": "pending",
-      "objective": "Ensure quality through comprehensive testing.",
+      "phase_id": "P10",
+      "name": "Enhanced Reservations Page",
       "sprints": [
         {
-          "sprint_id": "S6",
-          "duration_weeks": 1,
-          "focus": "Testing and verification",
+          "sprint_id": "S12",
           "tasks": [
             {
-              "id": "P4-S6-01",
-              "title": "Add Workers unit tests",
-              "area": "qa",
-              "owner_role": "QA",
-              "est_hours": 8,
-              "dependencies": [
-                "P1-S2-10"
-              ],
-              "deliverable": "Unit tests for API clients and endpoints",
-              "acceptance": "Coverage > 80% for Workers code"
+              "id": "P10-S12-01",
+              "title": "Add calendar/list view toggle with persistent preference",
+              "est_hours": 3
             },
             {
-              "id": "P4-S6-02",
-              "title": "Update frontend data layer tests",
-              "area": "qa",
-              "owner_role": "QA",
-              "est_hours": 6,
-              "dependencies": [
-                "P2-S3-06"
-              ],
-              "deliverable": "Tests using Workers API mocks",
-              "acceptance": "Existing tests pass with new API layer"
+              "id": "P10-S12-02",
+              "title": "Build all-properties calendar with reservation blocks",
+              "est_hours": 10
             },
             {
-              "id": "P4-S6-03",
-              "title": "Manual E2E verification",
-              "area": "qa",
-              "owner_role": "QA",
-              "est_hours": 8,
-              "dependencies": [
-                "P3-S5-05"
-              ],
-              "deliverable": "Test report for all user flows",
-              "acceptance": "All critical paths pass manually"
+              "id": "P10-S12-03",
+              "title": "Implement advanced filters (property, platform, status, date, guest)",
+              "est_hours": 5
             },
             {
-              "id": "P4-S6-04",
-              "title": "Performance testing",
-              "area": "qa",
-              "owner_role": "QA",
-              "est_hours": 4,
-              "dependencies": [
-                "P4-S6-01"
-              ],
-              "deliverable": "Response time benchmarks",
-              "acceptance": "p95 latency < 500ms for all endpoints"
+              "id": "P10-S12-04",
+              "title": "Create reservation detail modal with full information",
+              "est_hours": 6
+            },
+            {
+              "id": "P10-S12-05",
+              "title": "Build guest profile cards with booking history",
+              "est_hours": 5
+            },
+            {
+              "id": "P10-S12-06",
+              "title": "Add revenue summary cards (total, avg, platform breakdown)",
+              "est_hours": 4
+            },
+            {
+              "id": "P10-S12-07",
+              "title": "Implement reservation status workflow (confirmed \u2192 checked-in \u2192 out)",
+              "est_hours": 5
+            },
+            {
+              "id": "P10-S12-08",
+              "title": "Create today/tomorrow check-in/out timeline widget",
+              "est_hours": 5
+            },
+            {
+              "id": "P10-S12-09",
+              "title": "Add reservation export to CSV/Excel functionality",
+              "est_hours": 4
             }
           ]
         }
       ]
     },
     {
-      "phase_id": "P5",
-      "name": "Deployment & Operations",
-      "status": "pending",
-      "objective": "Production deployment and monitoring.",
+      "phase_id": "P11",
+      "name": "Enhanced Cleaning Page",
       "sprints": [
         {
-          "sprint_id": "S7",
-          "duration_weeks": 1,
-          "focus": "Production readiness",
+          "sprint_id": "S13",
           "tasks": [
             {
-              "id": "P5-S7-01",
-              "title": "Configure production Workers deployment",
-              "area": "infra",
-              "owner_role": "DevOps",
-              "est_hours": 4,
-              "dependencies": [
-                "P4-S6-03"
-              ],
-              "deliverable": "Production wrangler config with secrets",
-              "acceptance": "Workers deployed to production namespace"
+              "id": "P11-S13-01",
+              "title": "Build Kanban board layout (pending/assigned/in-progress/completed/verified)",
+              "est_hours": 6
             },
             {
-              "id": "P5-S7-02",
-              "title": "Set up Cloudflare Analytics",
-              "area": "infra",
-              "owner_role": "DevOps",
-              "est_hours": 4,
-              "dependencies": [
-                "P5-S7-01"
-              ],
-              "deliverable": "Analytics dashboard for Workers",
-              "acceptance": "Request metrics visible in CF dashboard"
+              "id": "P11-S13-02",
+              "title": "Implement drag-and-drop between columns with smooth animations",
+              "est_hours": 8
             },
             {
-              "id": "P5-S7-03",
-              "title": "Configure production secrets",
-              "area": "infra",
-              "owner_role": "DevOps",
-              "est_hours": 2,
-              "dependencies": [
-                "P5-S7-01"
-              ],
-              "deliverable": "API keys and tokens in CF secrets",
-              "acceptance": "Workers can access external APIs"
+              "id": "P11-S13-03",
+              "title": "Create cleaning job card with property, time, cleaner, progress",
+              "est_hours": 5
             },
             {
-              "id": "P5-S7-04",
-              "title": "Deploy frontend to Vercel/CF Pages",
-              "area": "infra",
-              "owner_role": "DevOps",
-              "est_hours": 4,
-              "dependencies": [
-                "P5-S7-01"
-              ],
-              "deliverable": "Frontend deployed to production",
-              "acceptance": "Dashboard accessible at production URL"
+              "id": "P11-S13-04",
+              "title": "Build interactive cleaning checklist modal with categories",
+              "est_hours": 6
+            },
+            {
+              "id": "P11-S13-05",
+              "title": "Implement before/after photo upload with preview",
+              "est_hours": 6
+            },
+            {
+              "id": "P11-S13-06",
+              "title": "Create issue reporting system (photos, severity, category)",
+              "est_hours": 5
+            },
+            {
+              "id": "P11-S13-07",
+              "title": "Add cleaner assignment interface with notifications",
+              "est_hours": 4
+            },
+            {
+              "id": "P11-S13-08",
+              "title": "Build cleaning schedule weekly/monthly calendar view",
+              "est_hours": 6
+            },
+            {
+              "id": "P11-S13-09",
+              "title": "Implement cleaner performance metrics dashboard",
+              "est_hours": 5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "phase_id": "P12",
+      "name": "Enhanced Tasks Page",
+      "sprints": [
+        {
+          "sprint_id": "S14",
+          "tasks": [
+            {
+              "id": "P12-S14-01",
+              "title": "Build priority matrix view (urgent/high vs medium/low)",
+              "est_hours": 6
+            },
+            {
+              "id": "P12-S14-02",
+              "title": "Create task creation modal with full form validation",
+              "est_hours": 6
+            },
+            {
+              "id": "P12-S14-03",
+              "title": "Implement task assignment system with user selection",
+              "est_hours": 5
+            },
+            {
+              "id": "P12-S14-04",
+              "title": "Add due date picker with overdue indicators",
+              "est_hours": 4
+            },
+            {
+              "id": "P12-S14-05",
+              "title": "Build task detail sidebar with smooth slide-in animation",
+              "est_hours": 5
+            },
+            {
+              "id": "P12-S14-06",
+              "title": "Implement task comments and activity log with timestamps",
+              "est_hours": 5
+            },
+            {
+              "id": "P12-S14-07",
+              "title": "Create task filtering and search with URL params",
+              "est_hours": 4
+            },
+            {
+              "id": "P12-S14-08",
+              "title": "Add task status workflow (pending \u2192 in-progress \u2192 completed)",
+              "est_hours": 4
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "phase_id": "P13",
+      "name": "Navigation & Layout Enhancements",
+      "sprints": [
+        {
+          "sprint_id": "S15",
+          "tasks": [
+            {
+              "id": "P13-S15-01",
+              "title": "Redesign sidebar with glass morphism and backdrop blur",
+              "est_hours": 5
+            },
+            {
+              "id": "P13-S15-02",
+              "title": "Add sidebar collapse/expand animation with icon-only mode",
+              "est_hours": 4
+            },
+            {
+              "id": "P13-S15-03",
+              "title": "Build global command palette (Cmd+K) with fuzzy search",
+              "est_hours": 8
+            },
+            {
+              "id": "P13-S15-04",
+              "title": "Create notifications dropdown with unread count",
+              "est_hours": 6
+            },
+            {
+              "id": "P13-S15-05",
+              "title": "Implement user profile menu with settings and theme toggle",
+              "est_hours": 4
+            },
+            {
+              "id": "P13-S15-06",
+              "title": "Add dynamic breadcrumb navigation based on route",
+              "est_hours": 3
+            },
+            {
+              "id": "P13-S15-07",
+              "title": "Build mobile navigation drawer with swipe gestures",
+              "est_hours": 5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "phase_id": "P14",
+      "name": "Micro-interactions & Animations",
+      "sprints": [
+        {
+          "sprint_id": "S16",
+          "tasks": [
+            {
+              "id": "P14-S16-01",
+              "title": "Add page transition animations with Framer Motion",
+              "est_hours": 4
+            },
+            {
+              "id": "P14-S16-02",
+              "title": "Implement skeleton loading screens for all pages",
+              "est_hours": 5
+            },
+            {
+              "id": "P14-S16-03",
+              "title": "Create animated number counters for stat cards",
+              "est_hours": 3
+            },
+            {
+              "id": "P14-S16-04",
+              "title": "Add hover micro-interactions (lift, glow, border) to cards",
+              "est_hours": 4
+            },
+            {
+              "id": "P14-S16-05",
+              "title": "Implement toast notification system with auto-dismiss",
+              "est_hours": 4
+            },
+            {
+              "id": "P14-S16-06",
+              "title": "Add progress indicators for all async actions",
+              "est_hours": 3
+            },
+            {
+              "id": "P14-S16-07",
+              "title": "Create empty states with illustrations and CTAs",
+              "est_hours": 4
+            },
+            {
+              "id": "P14-S16-08",
+              "title": "Implement prefers-reduced-motion media query support",
+              "est_hours": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "phase_id": "P15",
+      "name": "Performance & Optimization",
+      "sprints": [
+        {
+          "sprint_id": "S17",
+          "tasks": [
+            {
+              "id": "P15-S17-01",
+              "title": "Implement code splitting with dynamic imports per route",
+              "est_hours": 4
+            },
+            {
+              "id": "P15-S17-02",
+              "title": "Add lazy loading for Recharts components",
+              "est_hours": 3
+            },
+            {
+              "id": "P15-S17-03",
+              "title": "Optimize images with Next.js Image component",
+              "est_hours": 4
+            },
+            {
+              "id": "P15-S17-04",
+              "title": "Implement SWR/React Query caching for API responses",
+              "est_hours": 5
+            },
+            {
+              "id": "P15-S17-05",
+              "title": "Add service worker for offline support",
+              "est_hours": 6
+            },
+            {
+              "id": "P15-S17-06",
+              "title": "Optimize Workers KV caching strategy and TTL values",
+              "est_hours": 4
+            },
+            {
+              "id": "P15-S17-07",
+              "title": "Add Web Vitals performance monitoring",
+              "est_hours": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "phase_id": "P16",
+      "name": "Accessibility & Testing",
+      "sprints": [
+        {
+          "sprint_id": "S18",
+          "tasks": [
+            {
+              "id": "P16-S18-01",
+              "title": "Run accessibility audit with Axe DevTools on all pages",
+              "est_hours": 3
+            },
+            {
+              "id": "P16-S18-02",
+              "title": "Fix color contrast issues (WCAG AA 4.5:1 ratio)",
+              "est_hours": 4
+            },
+            {
+              "id": "P16-S18-03",
+              "title": "Add ARIA labels and roles to interactive elements",
+              "est_hours": 5
+            },
+            {
+              "id": "P16-S18-04",
+              "title": "Implement full keyboard navigation (Tab/Enter/Escape)",
+              "est_hours": 6
+            },
+            {
+              "id": "P16-S18-05",
+              "title": "Add visible focus states to all focusable elements",
+              "est_hours": 3
+            },
+            {
+              "id": "P16-S18-06",
+              "title": "Test with VoiceOver/NVDA screen readers",
+              "est_hours": 4
+            },
+            {
+              "id": "P16-S18-07",
+              "title": "Write component unit tests with Jest/Vitest (70% coverage)",
+              "est_hours": 8
+            },
+            {
+              "id": "P16-S18-08",
+              "title": "Add E2E tests with Playwright for critical flows",
+              "est_hours": 8
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "phase_id": "P17",
+      "name": "Production Deployment",
+      "sprints": [
+        {
+          "sprint_id": "S19",
+          "tasks": [
+            {
+              "id": "P17-S19-01",
+              "title": "Configure production environment variables",
+              "est_hours": 2
+            },
+            {
+              "id": "P17-S19-02",
+              "title": "Deploy Workers to production with secrets",
+              "est_hours": 2
+            },
+            {
+              "id": "P17-S19-03",
+              "title": "Deploy frontend to Vercel/CF Pages with custom domain",
+              "est_hours": 3
+            },
+            {
+              "id": "P17-S19-04",
+              "title": "Set up error tracking with Sentry",
+              "est_hours": 3
+            },
+            {
+              "id": "P17-S19-05",
+              "title": "Configure Cloudflare Analytics and monitoring",
+              "est_hours": 3
+            },
+            {
+              "id": "P17-S19-06",
+              "title": "Write deployment and operations documentation",
+              "est_hours": 4
             }
           ]
         }
@@ -683,9 +677,24 @@
     }
   ],
   "summary": {
-    "total_tasks": 54,
-    "total_hours": 282,
-    "phases": 6,
-    "sprints": 7
+    "total_phases": 12,
+    "total_sprints": 12,
+    "total_tasks": 100,
+    "total_estimated_hours": 458,
+    "estimated_weeks": 11.4,
+    "priority_order": [
+      "P6 (Design System) - Foundation for all UI work",
+      "P7 (Dashboard) - Most visible page, sets tone",
+      "P13 (Navigation) - Affects all pages",
+      "P8 (Properties) - Core feature",
+      "P10 (Reservations) - Core feature",
+      "P9 (Property Detail) - Depends on P8",
+      "P11 (Cleaning) - Can parallelize",
+      "P12 (Tasks) - Can parallelize",
+      "P14 (Animations) - Polish layer",
+      "P15 (Performance) - Optimization",
+      "P16 (A11y/Testing) - Quality assurance",
+      "P17 (Deployment) - Final step"
+    ]
   }
 }

@@ -17,10 +17,19 @@ const config: Config = {
     },
     extend: {
       fontFamily: {
-        sans: ["var(--font-sans)", "system-ui", "sans-serif"],
+        heading: ["Poppins", "sans-serif"],
+        body: ["Open Sans", "sans-serif"],
+        sans: ["Open Sans", "system-ui", "sans-serif"],
         mono: ["var(--font-mono)", "monospace"],
       },
       colors: {
+        // Design System Colors - Property Management SaaS
+        "property-primary": "#0F766E",
+        "property-secondary": "#14B8A6",
+        "property-cta": "#0369A1",
+        "property-bg": "#F0FDFA",
+        "property-text": "#134E4A",
+        "property-border": "#99F6E4",
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
@@ -108,10 +117,28 @@ const config: Config = {
           from: { height: "var(--radix-accordion-content-height)" },
           to: { height: "0" },
         },
+        "gradient-flow": {
+          "0%, 100%": { backgroundPosition: "0% 50%" },
+          "50%": { backgroundPosition: "100% 50%" },
+        },
+        shimmer: {
+          "0%": { backgroundPosition: "-200% 0" },
+          "100%": { backgroundPosition: "200% 0" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        "gradient-flow": "gradient-flow 8s ease infinite",
+        shimmer: "shimmer 2s linear infinite",
+      },
+      backgroundImage: {
+        "gradient-aurora-blue": "linear-gradient(135deg, #0080FF 0%, #00FFFF 100%)",
+        "gradient-aurora-purple": "linear-gradient(135deg, #6366F1 0%, #EC4899 100%)",
+        "gradient-aurora-mesh": "linear-gradient(135deg, #0080FF 0%, #6366F1 50%, #EC4899 100%)",
+      },
+      backdropBlur: {
+        xs: "2px",
       },
     },
   },

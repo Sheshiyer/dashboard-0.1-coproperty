@@ -37,7 +37,10 @@ reservations.get('/', async (c) => {
                     from: from || undefined,
                     to: to || undefined,
                     property_id: id,
-                }).catch(err => {
+                }).then(reservations =>
+                    // Add property_id to each reservation since API doesn't return it
+                    reservations.map(r => ({ ...r, property_id: id }))
+                ).catch(err => {
                     console.warn(`Failed to fetch reservations for property ${id}:`, err)
                     return [] // Return empty array on error, don't fail entire request
                 })
