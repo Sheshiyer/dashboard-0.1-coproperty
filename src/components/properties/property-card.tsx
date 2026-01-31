@@ -3,12 +3,10 @@
 import * as React from "react"
 import Link from "next/link"
 import Image from "next/image"
-import { Bed, Bath, Percent, DollarSign, MapPin, Home } from "lucide-react"
+import { Bed, Bath, Users, MapPin, Home } from "lucide-react"
 import { GlassCard } from "@/components/ui/glass"
 import { Badge } from "@/components/ui/badge"
 import { Checkbox } from "@/components/ui/checkbox"
-import { Sparkline } from "@/components/ui/stat-card"
-import { chartColors } from "@/components/ui/charts"
 import { cn } from "@/lib/utils"
 import type { PropertyCardData, PropertyStatus } from "@/types/property"
 import { STATUS_CONFIG } from "@/types/property"
@@ -44,19 +42,6 @@ interface MetricProps {
 // ---------------------------------------------------------------------------
 
 /**
- * Format a number as compact USD currency.
- * Example: 4500 -> "$4,500"
- */
-function formatCurrency(amount: number): string {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(amount)
-}
-
-/**
  * Extract a short location string from a full address.
  * Takes the first two comma-separated parts (street + city).
  */
@@ -80,20 +65,6 @@ function statusVariant(status: string) {
 function statusLabel(status: string) {
   const config = STATUS_CONFIG[status as PropertyStatus]
   return config?.label ?? status
-}
-
-/**
- * Determine sparkline color based on trend direction.
- * Compares first and last data points to detect upward or downward trend.
- * Returns green for positive trends, red for negative, and primary for neutral/insufficient data.
- */
-function trendColor(data: Array<{ value: number }>): string {
-  if (!data || data.length < 2) return chartColors.primary
-  const first = data[0].value
-  const last = data[data.length - 1].value
-  if (last > first) return chartColors.success
-  if (last < first) return chartColors.error
-  return chartColors.primary
 }
 
 // ---------------------------------------------------------------------------
@@ -131,9 +102,9 @@ function PropertyCardSkeleton({ className }: { className?: string }) {
         {/* Location */}
         <div className="h-4 w-1/2 bg-muted/50 rounded" />
 
-        {/* Metrics grid */}
-        <div className="grid grid-cols-2 gap-3 mt-4">
-          {Array.from({ length: 4 }).map((_, i) => (
+        {/* Metrics grid - 3 items only */}
+        <div className="space-y-3 mt-4">
+          {Array.from({ length: 3 }).map((_, i) => (
             <div key={i} className="flex items-center gap-2">
               <div className="h-8 w-8 bg-muted/50 rounded-md shrink-0" />
               <div className="space-y-1.5 flex-1">
@@ -198,18 +169,10 @@ export function PropertyCard({ property, loading, className, onAction, isSelecte
     imageUrl,
     bedrooms,
     bathrooms,
-    occupancyRate,
-    monthlyRevenue,
+    max_guests,
     status,
     segment,
-    occupancyTrend,
-    revenueTrend,
   } = property
-
-  const hasTrendData = !!(
-    (occupancyTrend && occupancyTrend.length > 1) ||
-    (revenueTrend && revenueTrend.length > 1)
-  )
 
   const displayName = name || internal_code || "Unnamed Property"
 
@@ -280,59 +243,16 @@ export function PropertyCard({ property, loading, className, onAction, isSelecte
             <span className="truncate">{shortLocation(address)}</span>
           </p>
 
-          {/* Metrics */}
-          <div className="mt-4 grid grid-cols-2 gap-3">
-            <Metric icon={Bed} value={bedrooms} label="Beds" />
-            <Metric icon={Bath} value={bathrooms} label="Baths" />
+          {/* Metrics - simplified to show only available data */}
+          <div className="mt-4 space-y-3">
+            <Metric icon={Bed} value={bedrooms} label="Bedrooms" />
+            <Metric icon={Bath} value={bathrooms} label="Bathrooms" />
             <Metric
-              icon={Percent}
-              value={
-                occupancyRate !== undefined ? `${occupancyRate}%` : "--"
-              }
-              label="Occupancy"
-            />
-            <Metric
-              icon={DollarSign}
-              value={
-                monthlyRevenue !== undefined
-                  ? formatCurrency(monthlyRevenue)
-                  : "--"
-              }
-              label="Revenue"
+              icon={Users}
+              value={max_guests}
+              label="Max Guests"
             />
           </div>
-
-          {/* Sparklines Footer - only rendered when trend data is available */}
-          {hasTrendData && (
-            <div className="mt-4 pt-4 border-t border-border/50">
-              <div className="grid grid-cols-2 gap-4">
-                {occupancyTrend && occupancyTrend.length > 1 && (
-                  <div>
-                    <p className="text-xs text-muted-foreground mb-2">
-                      30-Day Occupancy
-                    </p>
-                    <Sparkline
-                      data={occupancyTrend}
-                      height={40}
-                      color={trendColor(occupancyTrend)}
-                    />
-                  </div>
-                )}
-                {revenueTrend && revenueTrend.length > 1 && (
-                  <div>
-                    <p className="text-xs text-muted-foreground mb-2">
-                      30-Day Revenue
-                    </p>
-                    <Sparkline
-                      data={revenueTrend}
-                      height={40}
-                      color={trendColor(revenueTrend)}
-                    />
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
         </div>
     </GlassCard>
   )

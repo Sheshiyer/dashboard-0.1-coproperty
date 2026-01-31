@@ -9,20 +9,12 @@ import type { Property } from "@/types/api"
 
 /**
  * Extended property data for card display.
- * Fields not present in the API (imageUrl, occupancyRate, monthlyRevenue)
- * are optional and the component provides sensible defaults/fallbacks.
+ * Currently only adds imageUrl - other display fields may be added
+ * as we calculate metrics from reservation data in the future.
  */
 export interface PropertyCardData extends Property {
   /** URL for the property hero image */
   imageUrl?: string
-  /** Occupancy rate as a percentage (0-100) */
-  occupancyRate?: number
-  /** Monthly revenue in the property's local currency */
-  monthlyRevenue?: number
-  /** 30-day occupancy trend data points for sparkline */
-  occupancyTrend?: Array<{ value: number }>
-  /** 30-day revenue trend data points for sparkline */
-  revenueTrend?: Array<{ value: number }>
 }
 
 /**

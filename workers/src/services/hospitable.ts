@@ -15,6 +15,7 @@ export interface Property {
     check_out_time: string
     status: 'active' | 'inactive'
     segment?: string
+    picture?: string
 }
 
 export interface Reservation {
@@ -97,24 +98,20 @@ export class HospitableService {
     }
 
     async getProperties(): Promise<Property[]> {
-        const response = await this.fetch<HospitableResponse<any>>('/properties', { ttl: 300 })
+        const cacheKey = 'properties:bkk:filtered'
 
-        return response.data.map((p: any) => ({
-            id: p.id,
-            hospitable_id: p.id,
-            name: p.name || p.nickname || 'Unnamed Property',
-            internal_code: p.internal_code || p.id.slice(0, 8),
-            address: this.formatAddress(p.address),
-            building_name: p.address?.building,
-            room_number: p.address?.room,
-            bedrooms: p.bedrooms || 0,
-            bathrooms: p.bathrooms || 0,
-            max_guests: p.guests?.max || p.max_guests || 0,
-            check_in_time: p.check_in_time || '15:00',
-            check_out_time: p.check_out_time || '11:00',
-            status: p.status === 'active' ? 'active' : 'inactive',
-            segment: p.segment,
-        }))
+        // Try KV cache first
+        const cached = await this.cache.get(cacheKey, 'json')
+        if (cached) {
+            return cached as Property[]
+        }
+
+        // Cache miss: trigger sync
+        await this.syncAllProperties()
+
+        // Read from cache after sync
+        const synced = await this.cache.get(cacheKey, 'json')
+        return synced as Property[] || []
     }
 
     async getProperty(id: string): Promise<Property | null> {
@@ -137,6 +134,7 @@ export class HospitableService {
                 check_out_time: p.check_out_time || '11:00',
                 status: p.status === 'active' ? 'active' : 'inactive',
                 segment: p.segment,
+                picture: p.picture,
             }
         } catch {
             return null
@@ -224,5 +222,122 @@ export class HospitableService {
         if (!guest) return 'Guest'
         if (guest.name) return guest.name
         return [guest.first_name, guest.last_name].filter(Boolean).join(' ') || 'Guest'
+    }
+
+    /**
+     * Fetch all pages from a paginated endpoint using cursor-based pagination
+     */
+    private async fetchAllPages<T>(
+        endpoint: string,
+        delayMs: number = 1000
+    ): Promise<T[]> {
+        const allData: T[] = []
+        let nextUrl: string | undefined = `${this.baseUrl}${endpoint}`
+
+        while (nextUrl) {
+            const response = await fetch(nextUrl, {
+                headers: {
+                    Authorization: `Bearer ${this.token}`,
+                    'Content-Type': 'application/json',
+                },
+            })
+
+            if (!response.ok) {
+                const error = await response.text()
+                throw new Error(`Hospitable API error (${response.status}): ${error}`)
+            }
+
+            const result = await response.json() as HospitableResponse<T>
+            allData.push(...result.data)
+
+            nextUrl = result.links?.next
+
+            // Rate limiting delay between pages
+            if (nextUrl) {
+                await new Promise(resolve => setTimeout(resolve, delayMs))
+            }
+        }
+
+        return allData
+    }
+
+    /**
+     * Extract property number from names like "001-BKK-..." or "044-MNG-..."
+     */
+    private extractPropertyNumber(name: string): number | null {
+        const match = name.match(/^(\d{1,3})/)
+
+        if (match && match[1]) {
+            return parseInt(match[1], 10)
+        }
+
+        return null
+    }
+
+    /**
+     * Filter properties to only BKK properties (all numbers)
+     */
+    private filterBkkProperties(properties: any[]): any[] {
+        return properties.filter(property => {
+            const name = property.name || property.nickname || ''
+
+            // Only requirement: Must contain "BKK" (case-insensitive)
+            return /BKK/i.test(name)
+        })
+    }
+
+    /**
+     * Sync all properties from Hospitable API, filter to BKK 0-114, and cache
+     */
+    async syncAllProperties(): Promise<{
+        total: number
+        filtered: number
+        cached: boolean
+    }> {
+        // Fetch ALL properties with pagination
+        const allProperties = await this.fetchAllPages<any>('/properties', 1000)
+
+        // Filter to BKK 0-114
+        const filteredProperties = this.filterBkkProperties(allProperties)
+
+        // Transform to Property[] format
+        const properties = filteredProperties.map((p: any) => ({
+            id: p.id,
+            hospitable_id: p.id,
+            name: p.name || p.nickname || 'Unnamed Property',
+            internal_code: p.internal_code || p.id.slice(0, 8),
+            address: this.formatAddress(p.address),
+            building_name: p.address?.building,
+            room_number: p.address?.room,
+            bedrooms: p.bedrooms || 0,
+            bathrooms: p.bathrooms || 0,
+            max_guests: p.guests?.max || p.max_guests || 0,
+            check_in_time: p.check_in_time || '15:00',
+            check_out_time: p.check_out_time || '11:00',
+            status: p.status === 'active' ? 'active' : 'inactive',
+            segment: p.segment,
+            picture: p.picture,
+        }))
+
+        // Store in KV with 24-hour TTL
+        const cacheKey = 'properties:bkk:filtered'
+        await this.cache.put(cacheKey, JSON.stringify(properties), {
+            expirationTtl: 86400, // 24 hours
+        })
+
+        // Store sync metadata
+        await this.cache.put('properties:bkk:metadata', JSON.stringify({
+            lastSync: new Date().toISOString(),
+            totalFetched: allProperties.length,
+            filteredCount: properties.length,
+        }), {
+            expirationTtl: 86400,
+        })
+
+        return {
+            total: allProperties.length,
+            filtered: properties.length,
+            cached: true,
+        }
     }
 }

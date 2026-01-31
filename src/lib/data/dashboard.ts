@@ -5,6 +5,8 @@ export interface DashboardStats {
     pendingCleaning: number
     taskIssues: number
     totalProperties: number
+    occupancyRate: number
+    totalRevenue: number
 }
 
 export async function getDashboardStats(): Promise<DashboardStats> {
@@ -17,7 +19,9 @@ export async function getDashboardStats(): Promise<DashboardStats> {
             activeReservations: 0,
             pendingCleaning: 0,
             taskIssues: 0,
-            totalProperties: 0
+            totalProperties: 0,
+            occupancyRate: 0,
+            totalRevenue: 0
         }
     }
 }

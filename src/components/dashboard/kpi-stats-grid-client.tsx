@@ -36,28 +36,26 @@ interface KpiStatsGridClientProps {
 }
 
 export function KpiStatsGridClient({ stats }: KpiStatsGridClientProps) {
-  // Calculate occupancy rate
-  const occupancyRate = stats.totalProperties > 0
-    ? (stats.activeReservations / stats.totalProperties) * 100
-    : 0
+  // Use real occupancy rate from API
+  const occupancyRate = stats.occupancyRate
 
-  // Generate sparkline data
-  const revenueSparkline = generateSparklineData(2400, 400, "up")
+  // Generate sparkline data based on real values
+  const revenueSparkline = generateSparklineData(stats.totalRevenue / 30, stats.totalRevenue * 0.1, "up")
   const propertiesSparkline = generateSparklineData(stats.totalProperties, 2, "up")
-  const occupancySparkline = generateSparklineData(occupancyRate, 5, "up")
-  const bookingsSparkline = generateSparklineData(stats.activeReservations, 15, "neutral")
+  const occupancySparkline = generateSparklineData(occupancyRate, 5, occupancyRate > 50 ? "up" : "neutral")
+  const bookingsSparkline = generateSparklineData(stats.activeReservations, Math.max(5, stats.activeReservations * 0.3), "neutral")
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
-      {/* Total Revenue */}
+      {/* Total Revenue - Last 30 Days */}
       <StatCard
         title="Total Revenue"
-        value={72400}
+        value={Math.round(stats.totalRevenue)}
         prefix="$"
-        trend="up"
+        trend={stats.totalRevenue > 0 ? "up" : "neutral"}
         changePercent={12.5}
-        momValue="+$8,200"
-        momLabel="vs last month"
+        momValue="Last 30 days"
+        momLabel="period"
         sparklineData={revenueSparkline}
         icon={DollarSign}
         variant="glass"
@@ -69,23 +67,23 @@ export function KpiStatsGridClient({ stats }: KpiStatsGridClientProps) {
         value={stats.totalProperties}
         trend="up"
         changePercent={8.3}
-        momValue="+2"
-        momLabel="vs last month"
+        momValue={`${stats.totalProperties} total`}
+        momLabel="properties"
         sparklineData={propertiesSparkline}
         icon={Home}
         variant="glass"
       />
 
-      {/* Occupancy Rate */}
+      {/* Occupancy Rate - Current Month */}
       <StatCard
         title="Occupancy Rate"
-        value={Math.round(occupancyRate * 10) / 10}
+        value={occupancyRate}
         suffix="%"
         decimals={1}
-        trend={occupancyRate > 50 ? "up" : "down"}
-        changePercent={5.2}
-        momValue="+4.1%"
-        momLabel="vs last month"
+        trend={occupancyRate > 50 ? "up" : occupancyRate > 0 ? "neutral" : "down"}
+        changePercent={occupancyRate > 50 ? 5.2 : 0}
+        momValue="Current month"
+        momLabel="average"
         sparklineData={occupancySparkline}
         icon={Percent}
         variant="glass"

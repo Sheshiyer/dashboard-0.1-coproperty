@@ -15,6 +15,7 @@ export interface Property {
     check_out_time: string
     status: 'active' | 'inactive'
     segment?: string
+    picture?: string
 }
 
 export interface Reservation {

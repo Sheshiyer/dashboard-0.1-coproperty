@@ -11,6 +11,8 @@ interface DashboardStats {
     pendingCleaning: number
     taskIssues: number
     totalProperties: number
+    occupancyRate: number
+    totalRevenue: number
 }
 
 // GET /api/dashboard/stats - Get aggregated dashboard stats
@@ -66,11 +68,59 @@ dashboard.get('/stats', async (c) => {
             }
         }
 
+        // Calculate occupancy rate for current month
+        const now = new Date()
+        const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1)
+        const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0)
+        const daysInMonth = endOfMonth.getDate()
+
+        let totalOccupiedNights = 0
+        const totalAvailableNights = properties.length * daysInMonth
+
+        allReservations.forEach(reservation => {
+            if (reservation.status !== 'cancelled') {
+                const checkIn = new Date(reservation.check_in_date)
+                const checkOut = new Date(reservation.check_out_date)
+
+                // Calculate overlap with current month
+                const overlapStart = checkIn > startOfMonth ? checkIn : startOfMonth
+                const overlapEnd = checkOut < endOfMonth ? checkOut : endOfMonth
+
+                if (overlapStart < overlapEnd) {
+                    const nights = Math.ceil((overlapEnd.getTime() - overlapStart.getTime()) / (1000 * 60 * 60 * 24))
+                    totalOccupiedNights += nights
+                }
+            }
+        })
+
+        const occupancyRate = totalAvailableNights > 0
+            ? Math.round((totalOccupiedNights / totalAvailableNights) * 1000) / 10 // Round to 1 decimal
+            : 0
+
+        // Calculate total revenue for last 30 days
+        const thirtyDaysAgo = new Date(now)
+        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
+
+        let totalRevenue = 0
+        allReservations.forEach(reservation => {
+            if (reservation.status !== 'cancelled') {
+                const checkIn = new Date(reservation.check_in_date)
+                const checkOut = new Date(reservation.check_out_date)
+
+                // Include if reservation overlaps with last 30 days
+                if (checkOut >= thirtyDaysAgo && checkIn <= now) {
+                    totalRevenue += reservation.total_price || 0
+                }
+            }
+        })
+
         const stats: DashboardStats = {
             activeReservations,
             pendingCleaning,
             taskIssues,
             totalProperties: properties.length,
+            occupancyRate,
+            totalRevenue: Math.round(totalRevenue * 100) / 100,
         }
 
         return c.json({ data: stats })
@@ -518,6 +568,8 @@ dashboard.get('/recent-activity', async (c) => {
     const propertyMap = new Map(properties.map(p => [p.id, p]))
     const propertyIds = properties.map(p => p.id)
 
+    console.log(`[Activity Feed] Loaded ${properties.length} properties into map`)
+
     // Fetch recent data in parallel
     const [allReservations, cleaningJobs, taskIds] = await Promise.all([
         // Fetch reservations from all properties
@@ -526,8 +578,13 @@ dashboard.get('/recent-activity', async (c) => {
             const results = []
             for (let i = 0; i < propertyIds.length; i += batchSize) {
                 const batch = propertyIds.slice(i, i + batchSize)
-                const batchPromises = batch.map(id =>
-                    hospitable.getReservations({ property_id: id }).catch(() => [])
+                const batchPromises = batch.map(propertyId =>
+                    hospitable.getReservations({ property_id: propertyId })
+                        .then(reservations =>
+                            // Ensure property_id is set on each reservation
+                            reservations.map(r => ({ ...r, property_id: r.property_id || propertyId }))
+                        )
+                        .catch(() => [])
                 )
                 const batchResults = await Promise.all(batchPromises)
                 results.push(...batchResults.flat())
@@ -550,10 +607,14 @@ dashboard.get('/recent-activity', async (c) => {
     const now = Date.now()
 
     // Add reservation events
-    allReservations.forEach(reservation => {
+    allReservations.forEach((reservation, index) => {
         if (reservation.status !== 'cancelled') {
             const property = propertyMap.get(reservation.property_id)
             const propertyName = property?.name || 'Unknown Property'
+
+            if (index < 3) {
+                console.log(`[Activity Feed] Reservation ${index}: property_id="${reservation.property_id}", found=${!!property}, name="${propertyName}"`)
+            }
             const checkInTime = new Date(reservation.check_in_date).getTime()
             const checkOutTime = new Date(reservation.check_out_date).getTime()
             const createdTime = new Date(reservation.check_in_date).getTime() - (7 * 24 * 60 * 60 * 1000) // Assume booking 7 days before check-in

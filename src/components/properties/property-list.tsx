@@ -47,7 +47,10 @@ const itemVariants = {
  * The card component handles missing optional fields gracefully.
  */
 function toCardData(property: Property): PropertyCardData {
-  return { ...property }
+  return {
+    ...property,
+    imageUrl: property.picture
+  }
 }
 
 /**

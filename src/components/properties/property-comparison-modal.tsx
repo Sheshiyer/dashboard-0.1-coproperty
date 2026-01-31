@@ -43,21 +43,6 @@ interface ComparisonField {
 // Helpers
 // ---------------------------------------------------------------------------
 
-function formatCurrency(amount: number | undefined): string {
-  if (amount === undefined || amount === null) return "--"
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(amount)
-}
-
-function formatPercent(value: number | undefined): string {
-  if (value === undefined || value === null) return "--"
-  return `${value}%`
-}
-
 function statusLabel(status: string): string {
   const config = STATUS_CONFIG[status as PropertyStatus]
   return config?.label ?? status
@@ -309,27 +294,6 @@ const comparisonFields: ComparisonField[] = [
     render: (p) => String(p.max_guests ?? "--"),
   },
   {
-    key: "occupancy",
-    label: "Occupancy Rate",
-    higherIsBetter: true,
-    render: (p) => formatPercent(p.occupancyRate),
-  },
-  {
-    key: "monthlyRevenue",
-    label: "Monthly Revenue",
-    higherIsBetter: true,
-    render: (p) => formatCurrency(p.monthlyRevenue),
-  },
-  {
-    key: "annualRevenue",
-    label: "Annual Revenue (Est.)",
-    higherIsBetter: true,
-    render: (p) =>
-      p.monthlyRevenue !== undefined
-        ? formatCurrency(p.monthlyRevenue * 12)
-        : "--",
-  },
-  {
     key: "checkIn",
     label: "Check-in Time",
     render: (p) => p.check_in_time || "--",
@@ -349,10 +313,6 @@ const numericExtractors: Partial<Record<
   bedrooms: (p) => p.bedrooms,
   bathrooms: (p) => p.bathrooms,
   maxGuests: (p) => p.max_guests,
-  occupancy: (p) => p.occupancyRate,
-  monthlyRevenue: (p) => p.monthlyRevenue,
-  annualRevenue: (p) =>
-    p.monthlyRevenue !== undefined ? p.monthlyRevenue * 12 : undefined,
 }
 
 // ---------------------------------------------------------------------------
