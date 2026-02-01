@@ -4,7 +4,10 @@ import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { useDashboardRefresh } from "@/components/dashboard/dashboard-auto-refresh";
-import { Search, Bell, Menu, RefreshCw, Clock } from "lucide-react";
+import { NotificationsDropdown } from "@/components/layout/notifications-dropdown";
+import { MobileNav } from "@/components/layout/mobile-nav";
+import { useCommandPaletteStore } from "@/stores/command-palette-store";
+import { Search, RefreshCw, Clock } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 // ============================================================================
@@ -37,6 +40,7 @@ function formatLastUpdated(date: Date): string {
 
 export function Header() {
     const pathname = usePathname();
+    const openCommandPalette = useCommandPaletteStore((s) => s.open);
 
     // Dashboard refresh context - returns null if outside provider
     const refreshContext = useDashboardRefresh();
@@ -54,11 +58,8 @@ export function Header() {
 
     return (
         <header className="sticky top-0 z-30 flex h-16 w-full items-center gap-4 border-b bg-background px-6 shadow-sm mb-4">
-            {/* Mobile Menu Trigger */}
-            <Button variant="ghost" size="icon" className="md:hidden">
-                <Menu className="h-5 w-5" />
-                <span className="sr-only">Toggle menu</span>
-            </Button>
+            {/* Mobile Menu Trigger - replaced with MobileNav */}
+            <MobileNav />
 
             {/* Breadcrumbs */}
             <div className="hidden flex-col md:flex">
@@ -103,21 +104,24 @@ export function Header() {
                     </Button>
                 )}
 
-                {/* Search Placeholder */}
-                <div className="relative hidden w-full max-w-sm md:flex items-center">
-                    <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                    <input
-                        type="search"
-                        placeholder="Search properties, reservations..."
-                        className="flex h-9 w-full rounded-md border border-input bg-background pl-9 pr-4 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                    />
-                </div>
+                {/* Command Palette Trigger (search bar) */}
+                <button
+                    onClick={openCommandPalette}
+                    className={cn(
+                        "relative hidden w-full max-w-sm md:flex items-center",
+                        "rounded-md border border-input bg-background px-3 py-2 text-sm",
+                        "text-muted-foreground hover:bg-muted/50 transition-colors cursor-pointer",
+                    )}
+                >
+                    <Search className="mr-2 h-4 w-4 text-muted-foreground" />
+                    <span className="flex-1 text-left">Search properties, reservations...</span>
+                    <kbd className="pointer-events-none ml-2 hidden h-5 select-none items-center gap-1 rounded border border-muted-foreground/20 bg-muted/50 px-1.5 text-[10px] font-medium text-muted-foreground sm:inline-flex">
+                        {"\u2318"}K
+                    </kbd>
+                </button>
 
-                {/* Notifications */}
-                <Button variant="ghost" size="icon">
-                    <Bell className="h-5 w-5" />
-                    <span className="sr-only">Notifications</span>
-                </Button>
+                {/* Notifications - full dropdown with badge */}
+                <NotificationsDropdown />
 
                 {/* Theme Toggle */}
                 <ThemeToggle />

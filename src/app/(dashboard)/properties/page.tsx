@@ -3,6 +3,7 @@ import { getProperties } from "@/lib/data/properties"
 import { Button } from "@/components/ui/button"
 import { Plus } from "lucide-react"
 import { PropertiesContent } from "./properties-content"
+import { PropertiesSkeleton } from "@/components/skeleton/properties-skeleton"
 
 export default async function PropertiesPage() {
     const properties = await getProperties()
@@ -17,7 +18,7 @@ export default async function PropertiesPage() {
                 </Button>
             </div>
 
-            <Suspense fallback={<div className="h-24 w-full bg-muted/20 animate-pulse rounded" />}>
+            <Suspense fallback={<PropertiesSkeleton />}>
                 <PropertiesContent properties={properties} />
             </Suspense>
         </div>

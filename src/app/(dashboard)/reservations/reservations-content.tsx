@@ -7,6 +7,9 @@ import {
 } from "@/components/reservations/reservation-filters"
 import { ReservationSearch } from "@/components/reservations/reservation-search"
 import { ReservationList } from "@/components/reservations/reservation-list"
+import { ReservationCalendarSkeleton } from "@/components/skeleton/reservations-skeleton"
+import { EmptyState } from "@/components/ui/empty-state"
+import { CalendarDays } from "lucide-react"
 import type { Reservation, Property } from "@/types/api"
 import { filterReservations } from "@/lib/utils/reservation-filters"
 import { searchReservations } from "@/lib/utils/reservation-search"
@@ -39,11 +42,21 @@ function FilteredContent({ reservations, properties }: ReservationsContentProps)
         />
       </div>
 
-      {/* Reservation List */}
-      <ReservationList
-        reservations={filtered}
-        properties={properties}
-      />
+      {/* Reservation List or Empty State */}
+      {filtered && filtered.length > 0 ? (
+        <ReservationList
+          reservations={filtered}
+          properties={properties}
+        />
+      ) : (
+        <EmptyState
+          icon={CalendarDays}
+          title="No reservations"
+          description="No reservations match your filters. Reservations from connected booking platforms will appear here automatically."
+          actionLabel="Add Reservation"
+          secondaryActionLabel="Clear Filters"
+        />
+      )}
     </>
   )
 }
@@ -51,9 +64,7 @@ function FilteredContent({ reservations, properties }: ReservationsContentProps)
 export function ReservationsContent({ reservations, properties }: ReservationsContentProps) {
   return (
     <Suspense
-      fallback={
-        <div className="h-24 w-full bg-muted/20 animate-pulse rounded" />
-      }
+      fallback={<ReservationCalendarSkeleton />}
     >
       <div className="grid grid-cols-1 md:grid-cols-[280px_1fr] gap-6">
         {/* Sidebar Filters */}

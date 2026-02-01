@@ -10,22 +10,7 @@ import { CleaningSchedule } from "@/components/dashboard/cleaning-schedule"
 import { UpcomingCheckIns } from "@/components/dashboard/upcoming-check-ins"
 import { TaskPriorityMatrix } from "@/components/dashboard/task-priority-matrix"
 import { AlertsBanner } from "@/components/dashboard/alerts-banner"
-// ============================================================================
-// Skeleton Components
-// ============================================================================
-
-function StatsGridSkeleton() {
-    return (
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
-            {[...Array(4)].map((_, i) => (
-                <div
-                    key={i}
-                    className="h-32 rounded-xl border bg-muted/50 animate-pulse"
-                />
-            ))}
-        </div>
-    )
-}
+import { KpiCardsSkeleton } from "@/components/skeleton/dashboard-skeleton"
 
 // ============================================================================
 // Dashboard Page
@@ -65,7 +50,7 @@ export default async function DashboardPage() {
             {/* Responsive: 1 col mobile, 2 col tablet, 4 col desktop       */}
             {/* ============================================================ */}
             <section id="kpi-cards" aria-label="Key performance indicators">
-                <Suspense fallback={<StatsGridSkeleton />}>
+                <Suspense fallback={<KpiCardsSkeleton />}>
                     <KpiStatsGrid />
                 </Suspense>
             </section>
