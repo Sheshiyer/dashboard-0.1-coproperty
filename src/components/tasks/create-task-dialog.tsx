@@ -20,21 +20,26 @@ import {
     SelectValue,
 } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
+import { DatePicker } from "@/components/ui/date-picker"
 import { createTask } from "@/lib/actions/tasks"
 import { Property } from "@/lib/data/properties"
 import { Plus } from "lucide-react"
 import { useState } from "react"
-// import { useFormState } from "react-dom" // Available in Next.js 14? Or just use standard form action
 
 export function CreateTaskDialog({ properties }: { properties: Property[] }) {
     const [open, setOpen] = useState(false)
     const [isLoading, setIsLoading] = useState(false)
+    const [dueDate, setDueDate] = useState<Date | undefined>(undefined)
 
     async function handleSubmit(formData: FormData) {
         setIsLoading(true)
+        if (dueDate) {
+            formData.set("due_date", dueDate.toISOString())
+        }
         await createTask(formData)
         setIsLoading(false)
         setOpen(false)
+        setDueDate(undefined)
     }
 
     return (
@@ -45,7 +50,7 @@ export function CreateTaskDialog({ properties }: { properties: Property[] }) {
                     Create Task
                 </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px]">
+            <DialogContent className="sm:max-w-[500px]">
                 <form action={handleSubmit}>
                     <DialogHeader>
                         <DialogTitle>Create Task</DialogTitle>
@@ -70,7 +75,9 @@ export function CreateTaskDialog({ properties }: { properties: Property[] }) {
                                 </SelectTrigger>
                                 <SelectContent>
                                     {properties.map(p => (
-                                        <SelectItem key={p.id} value={p.id}>{p.building_name}</SelectItem>
+                                        <SelectItem key={p.id} value={p.id}>
+                                            {p.building_name || p.name || p.internal_code}
+                                        </SelectItem>
                                     ))}
                                 </SelectContent>
                             </Select>
@@ -79,17 +86,57 @@ export function CreateTaskDialog({ properties }: { properties: Property[] }) {
                             <Label htmlFor="priority" className="text-right">
                                 Priority
                             </Label>
-                            <Select name="priority" defaultValue="normal" required>
+                            <Select name="priority" defaultValue="medium" required>
                                 <SelectTrigger className="col-span-3">
                                     <SelectValue placeholder="Select priority" />
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value="low">Low</SelectItem>
-                                    <SelectItem value="normal">Normal</SelectItem>
+                                    <SelectItem value="medium">Medium</SelectItem>
                                     <SelectItem value="high">High</SelectItem>
                                     <SelectItem value="urgent">Urgent</SelectItem>
                                 </SelectContent>
                             </Select>
+                        </div>
+                        <div className="grid grid-cols-4 items-center gap-4">
+                            <Label htmlFor="category" className="text-right">
+                                Category
+                            </Label>
+                            <Select name="category" defaultValue="general" required>
+                                <SelectTrigger className="col-span-3">
+                                    <SelectValue placeholder="Select category" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="maintenance">Maintenance</SelectItem>
+                                    <SelectItem value="inspection">Inspection</SelectItem>
+                                    <SelectItem value="inventory">Inventory</SelectItem>
+                                    <SelectItem value="general">General</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+                        <div className="grid grid-cols-4 items-center gap-4">
+                            <Label className="text-right">
+                                Due Date
+                            </Label>
+                            <div className="col-span-3">
+                                <DatePicker
+                                    value={dueDate}
+                                    onChange={setDueDate}
+                                    name="due_date"
+                                    placeholder="Set due date (optional)"
+                                />
+                            </div>
+                        </div>
+                        <div className="grid grid-cols-4 items-center gap-4">
+                            <Label htmlFor="assigned_to" className="text-right">
+                                Assign To
+                            </Label>
+                            <Input
+                                id="assigned_to"
+                                name="assigned_to"
+                                className="col-span-3"
+                                placeholder="Assignee name (optional)"
+                            />
                         </div>
                         <div className="grid grid-cols-4 items-center gap-4">
                             <Label htmlFor="description" className="text-right">
@@ -99,7 +146,9 @@ export function CreateTaskDialog({ properties }: { properties: Property[] }) {
                         </div>
                     </div>
                     <DialogFooter>
-                        <Button type="submit" disabled={isLoading}>Save Task</Button>
+                        <Button type="submit" disabled={isLoading} loading={isLoading}>
+                            Save Task
+                        </Button>
                     </DialogFooter>
                 </form>
             </DialogContent>
