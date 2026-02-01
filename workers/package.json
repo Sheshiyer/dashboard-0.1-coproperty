@@ -5,14 +5,21 @@
     "scripts": {
         "dev": "wrangler dev",
         "deploy": "wrangler deploy",
-        "tail": "wrangler tail"
+        "tail": "wrangler tail",
+        "test": "vitest run",
+        "test:watch": "vitest",
+        "test:coverage": "vitest run --coverage",
+        "test:ui": "vitest --ui"
     },
     "dependencies": {
         "hono": "^4.0.0"
     },
     "devDependencies": {
         "@cloudflare/workers-types": "^4.20240117.0",
+        "@vitest/coverage-v8": "^4.0.18",
+        "miniflare": "^4.20260128.0",
         "typescript": "^5.0.0",
+        "vitest": "^4.0.18",
         "wrangler": "^4.0.0"
     }
 }
