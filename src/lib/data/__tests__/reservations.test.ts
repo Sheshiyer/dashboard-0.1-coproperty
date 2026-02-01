@@ -8,7 +8,6 @@
 import { describe, expect, it, beforeEach, afterEach } from "bun:test"
 import {
     mockReservation,
-    mockReservation2,
     mockReservations,
     mockProperties,
     wrapApiResponse

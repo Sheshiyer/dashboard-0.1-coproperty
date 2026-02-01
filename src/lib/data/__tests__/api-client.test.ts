@@ -8,8 +8,7 @@
  * - Authentication headers
  */
 
-import { describe, expect, it, beforeEach, afterEach, mock, spyOn } from "bun:test"
-import { createMockFetch, createErrorFetch, createNetworkErrorFetch, wrapApiResponse } from "./mock-helpers"
+import { describe, expect, it, afterEach } from "bun:test"
 
 // We need to test the apiClient module
 // Since it's not exported as a class, we'll test through the data layer modules

@@ -8,7 +8,6 @@
 import { describe, expect, it, beforeEach, afterEach } from "bun:test"
 import {
     mockCleaningJob,
-    mockCleaningJob2,
     mockCleaningJobs,
     mockProperties,
     wrapApiResponse

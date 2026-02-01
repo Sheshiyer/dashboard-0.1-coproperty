@@ -638,10 +638,7 @@ describe("Dashboard Data Layer", () => {
     describe("Error Recovery", () => {
         it("individual endpoints fail independently", async () => {
             // Each dashboard function should fail gracefully without affecting others
-            let callCount = 0
-
             globalThis.fetch = async (url) => {
-                callCount++
                 const urlStr = url as string
 
                 // Stats succeeds

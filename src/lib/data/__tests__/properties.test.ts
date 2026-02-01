@@ -8,7 +8,6 @@
 import { describe, expect, it, beforeEach, afterEach } from "bun:test"
 import {
     mockProperty,
-    mockProperty2,
     mockProperties,
     mockReservations,
     mockCleaningJobs,

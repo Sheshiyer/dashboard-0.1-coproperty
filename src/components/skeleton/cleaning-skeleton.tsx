@@ -34,10 +34,9 @@ export function CleaningSkeleton() {
  * KanbanColumnSkeleton - A single Kanban column placeholder.
  */
 function KanbanColumnSkeleton({
-  title,
   cards = 3,
 }: {
-  title: string
+  title?: string
   cards?: number
 }) {
   return (
