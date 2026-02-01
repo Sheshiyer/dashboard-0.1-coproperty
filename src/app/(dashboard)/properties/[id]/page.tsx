@@ -8,13 +8,14 @@ import { PropertyDetailTabs } from "./property-detail-tabs"
 import { PropertyHero } from "@/components/properties/property-hero"
 
 interface Props {
-  params: {
+  params: Promise<{
     id: string
-  }
+  }>
 }
 
 export default async function PropertyDetailPage({ params }: Props) {
-  const property = await getProperty(params.id)
+  const { id } = await params
+  const property = await getProperty(id)
 
   if (!property) {
     notFound()

@@ -7,7 +7,6 @@ const OccupancyChartClient = dynamic(
     () => import("./occupancy-chart-client").then(m => ({ default: m.OccupancyChartClient })),
     {
         loading: () => <Skeleton className="h-80 w-full rounded-xl" />,
-        ssr: false,
     }
 )
 

@@ -1,0 +1,11 @@
+# Cloudflare Pages configuration
+name = "co-property-dashboard"
+compatibility_date = "2024-01-01"
+compatibility_flags = ["nodejs_compat"]
+
+# Environment variables
+[vars]
+NEXT_PUBLIC_WORKERS_URL = "https://co-property-api.sheshnarayan-iyer.workers.dev"
+
+# Secrets (set via wrangler secret put)
+# - NEXT_PUBLIC_WORKERS_URL (production Workers URL)

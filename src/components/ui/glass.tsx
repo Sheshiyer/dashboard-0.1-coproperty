@@ -339,10 +339,12 @@ GlassBadge.displayName = "GlassBadge";
 // Export all components
 // ============================================================================
 
-export default {
+const GlassComponents = {
   GlassCard,
   GlassPanel,
   GlassNavbar,
   GlassButton,
   GlassBadge,
 };
+
+export default GlassComponents;

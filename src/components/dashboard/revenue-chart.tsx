@@ -8,7 +8,6 @@ const RevenueChartClient = dynamic(
     () => import("./revenue-chart-client").then(m => ({ default: m.RevenueChartClient })),
     {
         loading: () => <Skeleton className="h-80 w-full rounded-xl" />,
-        ssr: false,
     }
 )
 

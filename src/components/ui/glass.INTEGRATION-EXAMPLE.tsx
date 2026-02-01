@@ -38,12 +38,15 @@ export default function DashboardPageExample() {
 
           {/* Navigation - could be a separate component */}
           <nav className="hidden md:flex items-center gap-6">
+            {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
             <a href="/dashboard" className="text-property-text/80 dark:text-white/70 hover:text-property-primary transition-colors">
               Dashboard
             </a>
+            {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
             <a href="/properties" className="text-property-text/80 dark:text-white/70 hover:text-property-primary transition-colors">
               Properties
             </a>
+            {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
             <a href="/tenants" className="text-property-text/80 dark:text-white/70 hover:text-property-primary transition-colors">
               Tenants
             </a>

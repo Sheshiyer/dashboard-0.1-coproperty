@@ -7,7 +7,6 @@ const BookingSourcesChartClient = dynamic(
     () => import("./booking-sources-chart-client").then(m => ({ default: m.BookingSourcesChartClient })),
     {
         loading: () => <Skeleton className="h-80 w-full rounded-xl" />,
-        ssr: false,
     }
 )
 

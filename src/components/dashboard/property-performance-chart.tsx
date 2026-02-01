@@ -7,7 +7,6 @@ const PropertyPerformanceChartClient = dynamic(
     () => import("./property-performance-chart-client").then(m => ({ default: m.PropertyPerformanceChartClient })),
     {
         loading: () => <Skeleton className="h-80 w-full rounded-xl" />,
-        ssr: false,
     }
 )
 
