@@ -4,6 +4,7 @@ import Script from "next/script";
 import "./globals.css";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import { QueryProvider } from "@/components/providers/query-provider";
+import { WebVitalsProvider } from "@/components/providers/web-vitals-provider";
 import { cn } from "@/lib/utils";
 
 import { Toaster } from "@/components/ui/toaster";
@@ -64,6 +65,7 @@ export default function RootLayout({
             </a>
             {children}
             <Toaster />
+            <WebVitalsProvider />
           </ThemeProvider>
         </QueryProvider>
       </body>

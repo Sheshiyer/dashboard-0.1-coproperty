@@ -22,6 +22,7 @@ import {
     ZoomIn,
     Trash2,
     Loader2,
+    AlertCircle,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 
@@ -33,9 +34,14 @@ export interface CleaningPhoto {
     id: string
     jobId: string
     type: "before" | "after"
-    dataUrl: string
+    url: string
+    /** @deprecated Use url instead. Kept for backward compatibility with existing photos. */
+    dataUrl?: string
+    key?: string
     caption?: string
     timestamp: string
+    filename?: string
+    size?: number
 }
 
 interface PhotoUploadDialogProps {
@@ -45,6 +51,25 @@ interface PhotoUploadDialogProps {
     propertyName: string
     existingPhotos?: CleaningPhoto[]
     onSave: (jobId: string, photos: CleaningPhoto[]) => Promise<void>
+}
+
+// ============================================================================
+// Constants
+// ============================================================================
+
+const WORKERS_URL = process.env.NEXT_PUBLIC_WORKERS_URL || "http://localhost:8787"
+const MAX_FILE_SIZE = 10 * 1024 * 1024 // 10MB
+
+// ============================================================================
+// Helpers
+// ============================================================================
+
+/**
+ * Get the display URL for a photo.
+ * Supports both new R2 url and legacy dataUrl for backward compatibility.
+ */
+function getPhotoSrc(photo: CleaningPhoto): string {
+    return photo.url || photo.dataUrl || ""
 }
 
 // ============================================================================
@@ -68,6 +93,7 @@ function PhotoGallery({ photos, initialIndex = 0, onClose }: PhotoGalleryProps) 
             <button
                 onClick={onClose}
                 className="absolute top-4 right-4 text-white/80 hover:text-white z-10"
+                aria-label="Close gallery"
             >
                 <X className="h-6 w-6" />
             </button>
@@ -82,6 +108,7 @@ function PhotoGallery({ photos, initialIndex = 0, onClose }: PhotoGalleryProps) 
                 <button
                     onClick={() => setCurrentIndex((i) => i - 1)}
                     className="absolute left-4 top-1/2 -translate-y-1/2 text-white/80 hover:text-white bg-black/40 rounded-full p-2"
+                    aria-label="Previous photo"
                 >
                     <ChevronLeft className="h-6 w-6" />
                 </button>
@@ -90,6 +117,7 @@ function PhotoGallery({ photos, initialIndex = 0, onClose }: PhotoGalleryProps) 
                 <button
                     onClick={() => setCurrentIndex((i) => i + 1)}
                     className="absolute right-4 top-1/2 -translate-y-1/2 text-white/80 hover:text-white bg-black/40 rounded-full p-2"
+                    aria-label="Next photo"
                 >
                     <ChevronRight className="h-6 w-6" />
                 </button>
@@ -97,7 +125,7 @@ function PhotoGallery({ photos, initialIndex = 0, onClose }: PhotoGalleryProps) 
 
             {/* Image */}
             <img
-                src={current.dataUrl}
+                src={getPhotoSrc(current)}
                 alt={current.caption || `${current.type} photo`}
                 className="max-w-[90vw] max-h-[80vh] object-contain rounded-lg"
             />
@@ -135,6 +163,52 @@ export function PhotoCountBadge({ count, className }: PhotoCountBadgeProps) {
 }
 
 // ============================================================================
+// R2 Upload Service
+// ============================================================================
+
+interface UploadResult {
+    success: boolean
+    url: string
+    key: string
+    filename: string
+    size: number
+    contentType: string
+}
+
+async function uploadPhotoToR2(
+    file: File,
+    jobId: string,
+    type: "before" | "after"
+): Promise<UploadResult> {
+    const formData = new FormData()
+    formData.append("file", file)
+    formData.append("jobId", jobId)
+    formData.append("type", type)
+
+    const response = await fetch(`${WORKERS_URL}/api/photos/upload`, {
+        method: "POST",
+        body: formData,
+    })
+
+    if (!response.ok) {
+        const errorBody = await response.json().catch(() => ({ error: "Upload failed" }))
+        throw new Error((errorBody as { error?: string }).error || `Upload failed: ${response.status}`)
+    }
+
+    return response.json() as Promise<UploadResult>
+}
+
+async function deletePhotoFromR2(key: string): Promise<void> {
+    const response = await fetch(`${WORKERS_URL}/api/photos/${key}`, {
+        method: "DELETE",
+    })
+
+    if (!response.ok) {
+        console.error("Failed to delete photo from R2:", key)
+    }
+}
+
+// ============================================================================
 // Photo Upload Dialog
 // ============================================================================
 
@@ -151,6 +225,7 @@ export function PhotoUploadDialog({
     const [saving, setSaving] = useState(false)
     const [galleryIndex, setGalleryIndex] = useState<number | null>(null)
     const [uploading, setUploading] = useState(false)
+    const [uploadError, setUploadError] = useState<string | null>(null)
     const fileInputRef = useRef<HTMLInputElement>(null)
 
     const beforePhotos = photos.filter((p) => p.type === "before")
@@ -163,31 +238,46 @@ export function PhotoUploadDialog({
             if (!files || files.length === 0) return
 
             setUploading(true)
+            setUploadError(null)
+
             const newPhotos: CleaningPhoto[] = []
 
             for (const file of Array.from(files)) {
-                if (!file.type.startsWith("image/")) continue
-                if (file.size > 10 * 1024 * 1024) continue // 10MB max
+                if (!file.type.startsWith("image/")) {
+                    setUploadError(`Skipped ${file.name}: not an image file`)
+                    continue
+                }
+                if (file.size > MAX_FILE_SIZE) {
+                    setUploadError(
+                        `Skipped ${file.name}: exceeds 10MB limit (${(file.size / 1024 / 1024).toFixed(1)}MB)`
+                    )
+                    continue
+                }
 
-                const dataUrl = await new Promise<string>((resolve) => {
-                    const reader = new FileReader()
-                    reader.onload = () => resolve(reader.result as string)
-                    reader.readAsDataURL(file)
-                })
+                try {
+                    const result = await uploadPhotoToR2(file, jobId, activeTab)
 
-                // Compress if needed by resizing
-                const compressed = await compressImage(dataUrl, 1200, 0.8)
-
-                newPhotos.push({
-                    id: `photo_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
-                    jobId,
-                    type: activeTab,
-                    dataUrl: compressed,
-                    timestamp: new Date().toISOString(),
-                })
+                    newPhotos.push({
+                        id: `photo_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+                        jobId,
+                        type: activeTab,
+                        url: result.url,
+                        key: result.key,
+                        filename: result.filename,
+                        size: result.size,
+                        timestamp: new Date().toISOString(),
+                    })
+                } catch (error) {
+                    console.error("Upload failed for", file.name, error)
+                    setUploadError(
+                        `Failed to upload ${file.name}: ${error instanceof Error ? error.message : "Unknown error"}`
+                    )
+                }
             }
 
-            setPhotos((prev) => [...prev, ...newPhotos])
+            if (newPhotos.length > 0) {
+                setPhotos((prev) => [...prev, ...newPhotos])
+            }
             setUploading(false)
 
             // Reset input
@@ -199,7 +289,14 @@ export function PhotoUploadDialog({
     )
 
     const removePhoto = useCallback((photoId: string) => {
-        setPhotos((prev) => prev.filter((p) => p.id !== photoId))
+        setPhotos((prev) => {
+            const photo = prev.find((p) => p.id === photoId)
+            // Delete from R2 in background if it has a key (R2-stored photo)
+            if (photo?.key) {
+                deletePhotoFromR2(photo.key)
+            }
+            return prev.filter((p) => p.id !== photoId)
+        })
     }, [])
 
     const handleSave = useCallback(async () => {
@@ -227,8 +324,10 @@ export function PhotoUploadDialog({
                     </DialogHeader>
 
                     {/* Before/After Tabs */}
-                    <div className="flex gap-2 px-1">
+                    <div className="flex gap-2 px-1" role="tablist">
                         <button
+                            role="tab"
+                            aria-selected={activeTab === "before"}
                             onClick={() => setActiveTab("before")}
                             className={cn(
                                 "flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all",
@@ -243,6 +342,8 @@ export function PhotoUploadDialog({
                             </Badge>
                         </button>
                         <button
+                            role="tab"
+                            aria-selected={activeTab === "after"}
                             onClick={() => setActiveTab("after")}
                             className={cn(
                                 "flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all",
@@ -258,8 +359,23 @@ export function PhotoUploadDialog({
                         </button>
                     </div>
 
+                    {/* Upload Error */}
+                    {uploadError && (
+                        <div className="flex items-center gap-2 px-3 py-2 mx-1 bg-destructive/10 text-destructive text-sm rounded-lg">
+                            <AlertCircle className="h-4 w-4 flex-shrink-0" />
+                            <span>{uploadError}</span>
+                            <button
+                                onClick={() => setUploadError(null)}
+                                className="ml-auto"
+                                aria-label="Dismiss error"
+                            >
+                                <X className="h-3 w-3" />
+                            </button>
+                        </div>
+                    )}
+
                     {/* Photo Grid */}
-                    <div className="flex-1 overflow-y-auto min-h-0 px-1">
+                    <div className="flex-1 overflow-y-auto min-h-0 px-1" role="tabpanel">
                         {activePhotos.length === 0 ? (
                             <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
                                 <ImageIcon className="h-12 w-12 mb-3 opacity-40" />
@@ -279,7 +395,7 @@ export function PhotoUploadDialog({
                                         className="relative group overflow-hidden aspect-square"
                                     >
                                         <img
-                                            src={photo.dataUrl}
+                                            src={getPhotoSrc(photo)}
                                             alt={`${photo.type} photo`}
                                             className="w-full h-full object-cover rounded-lg"
                                         />
@@ -291,12 +407,14 @@ export function PhotoUploadDialog({
                                                     setGalleryIndex(allIdx)
                                                 }}
                                                 className="p-2 bg-white/20 backdrop-blur-sm rounded-full text-white hover:bg-white/30"
+                                                aria-label="Zoom in"
                                             >
                                                 <ZoomIn className="h-4 w-4" />
                                             </button>
                                             <button
                                                 onClick={() => removePhoto(photo.id)}
                                                 className="p-2 bg-red-500/60 backdrop-blur-sm rounded-full text-white hover:bg-red-500/80"
+                                                aria-label="Delete photo"
                                             >
                                                 <Trash2 className="h-4 w-4" />
                                             </button>
@@ -335,7 +453,7 @@ export function PhotoUploadDialog({
                             {uploading ? (
                                 <>
                                     <Loader2 className="h-4 w-4 animate-spin" />
-                                    Processing...
+                                    Uploading to cloud...
                                 </>
                             ) : (
                                 <>
@@ -370,41 +488,4 @@ export function PhotoUploadDialog({
             )}
         </>
     )
-}
-
-// ============================================================================
-// Image Compression Utility
-// ============================================================================
-
-function compressImage(
-    dataUrl: string,
-    maxWidth: number,
-    quality: number
-): Promise<string> {
-    return new Promise((resolve) => {
-        const img = new window.Image()
-        img.onload = () => {
-            const canvas = document.createElement("canvas")
-            let width = img.width
-            let height = img.height
-
-            if (width > maxWidth) {
-                height = (height * maxWidth) / width
-                width = maxWidth
-            }
-
-            canvas.width = width
-            canvas.height = height
-
-            const ctx = canvas.getContext("2d")
-            if (!ctx) {
-                resolve(dataUrl)
-                return
-            }
-            ctx.drawImage(img, 0, 0, width, height)
-            resolve(canvas.toDataURL("image/jpeg", quality))
-        }
-        img.onerror = () => resolve(dataUrl)
-        img.src = dataUrl
-    })
 }

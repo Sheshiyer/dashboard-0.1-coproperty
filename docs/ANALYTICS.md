@@ -60,6 +60,62 @@ trackEvent("task_created", { priority: "high", category: "maintenance" })
 4. View page views, visitors, and performance metrics
 5. Custom events can be viewed in the Events tab (when using Analytics Engine)
 
+## Web Vitals Monitoring
+
+Core Web Vitals are automatically tracked via the `web-vitals` library (v5) and sent to Cloudflare Workers for logging and storage.
+
+### Metrics Tracked
+
+| Metric | Full Name | Target | Description |
+|--------|-----------|--------|-------------|
+| **LCP** | Largest Contentful Paint | <=2.5s | Main content load time |
+| **INP** | Interaction to Next Paint | <=200ms | Interactivity responsiveness (replaces FID) |
+| **CLS** | Cumulative Layout Shift | <=0.1 | Visual stability |
+| **FCP** | First Contentful Paint | <=1.8s | First render time |
+| **TTFB** | Time to First Byte | <=600ms | Server response time |
+
+### Architecture
+
+```
+Browser (web-vitals lib)
+  --> sendBeacon / fetch
+    --> Workers API (/api/analytics/vitals)
+      --> console.log (Workers Logs)
+      --> KV storage (30-day retention)
+```
+
+### Implementation Files
+
+- `src/lib/web-vitals.ts` - Client-side metric collection and transmission
+- `src/components/providers/web-vitals-provider.tsx` - React integration (useEffect on mount)
+- `workers/src/routes/analytics.ts` - Server-side ingestion endpoint
+
+### Performance Targets
+
+| Metric | Good | Needs Improvement | Poor |
+|--------|------|-------------------|------|
+| LCP | <=2.5s | 2.5s-4.0s | >4.0s |
+| INP | <=200ms | 200ms-500ms | >500ms |
+| CLS | <=0.1 | 0.1-0.25 | >0.25 |
+| FCP | <=1.8s | 1.8s-3.0s | >3.0s |
+| TTFB | <=600ms | 600ms-1500ms | >1500ms |
+
+### Viewing Web Vitals Data
+
+1. Go to Cloudflare Dashboard -> Workers & Pages
+2. Select the coproperty-api worker
+3. Open **Logs** tab
+4. Filter by `[Web Vitals]` to see metric data
+5. For historical data, check the CACHE KV namespace with prefix `vitals:`
+
+### Privacy
+
+- No cookies used
+- User agent is collected for browser compatibility analysis only
+- URLs are page paths (no query parameters with user data)
+- `sendBeacon` ensures metrics are sent even during page unload without blocking
+- All collection fails silently if blocked by privacy extensions
+
 ## Extending Analytics
 
 To add a new tracked event:

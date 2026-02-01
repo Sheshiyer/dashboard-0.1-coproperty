@@ -163,10 +163,107 @@ Card titles use `h3` via the `CardTitle` component.
 | Error text (#ef4444) | 4.5:1 | 4.5:1 | Pass |
 | Warning text (#f59e0b) | 3.1:1 (large text only) | 3.5:1 | Pass (large text) |
 
-## Screen Reader Testing Notes
+## Screen Reader Testing
 
-- **VoiceOver (macOS):** All navigation landmarks announced correctly. Skip link functions as expected. Dialogs trap focus properly (Radix UI). Toast notifications announced via live region.
-- **Recommended:** Test with NVDA on Windows and TalkBack on Android for broader coverage.
+### Testing Environment
+
+- **Tool**: VoiceOver on macOS Sonoma
+- **Browser**: Safari 18.x (recommended for VoiceOver compatibility)
+- **Date**: 2026-02-01
+
+### Navigation Patterns
+
+#### Skip Navigation
+Press Tab immediately on page load -> Skip to content link -> Press Enter -> Focus moves to main content area (`#main-content`).
+
+#### Command Palette
+Screen reader announces: "Open search (Command K)" on the search button.
+- Opens with Cmd+K
+- Search field auto-focused with placeholder text announced
+- Results announced as list items
+- Arrow keys navigate results
+- Enter activates selected result
+- Escape closes and returns focus to previous element
+
+#### Data Tables
+Tables announce row and column headers correctly.
+- Use VoiceOver table navigation (Ctrl+Opt+Arrow keys)
+- Sort buttons announce current sort direction
+- Pagination controls wrapped in `<nav aria-label="Table pagination">`
+
+#### Dialogs
+- Dialog title announced on open (Radix UI Dialog)
+- Focus trapped within dialog (built-in Radix behaviour)
+- Escape closes dialog and returns focus to trigger element
+- All close buttons have `aria-label`
+
+### Page-Level Testing Results
+
+#### Dashboard (/)
+- [x] Page title "Dashboard Overview" announced as h1
+- [x] Skip navigation link works
+- [x] All 4 KPI cards readable with values
+- [x] Alerts banner announces as region with `aria-live="polite"`
+- [x] Sync button status announced via live region
+- [ ] Charts have limited screen reader support (known limitation)
+
+#### Properties (/properties)
+- [x] Page title "Properties" announced as h1
+- [x] Property cards announce name, status, occupancy
+- [x] Search field labeled with `aria-label`
+- [x] View toggle uses tablist/tab ARIA pattern
+
+#### Tasks (/tasks)
+- [x] Page title "Tasks" announced as h1
+- [x] Table navigation works with VoiceOver table commands
+- [x] Create task button accessible
+- [x] Task detail sidebar announces correctly
+- [x] Icon-only buttons have `aria-label` (edit, delete, cancel)
+
+#### Cleaning (/cleaning)
+- [x] Page title "Cleaning Schedule" announced as h1
+- [x] Kanban columns announce status
+- [x] Job cards readable with property and status
+- [x] View toggle uses proper tab ARIA semantics
+- [x] Checklist dialog uses tab roles with progress bar ARIA
+- [ ] Drag and drop has limited keyboard alternative (known limitation)
+
+#### Reservations (/reservations)
+- [x] Page title "Reservations" announced as h1
+- [x] Calendar navigation works
+- [x] Reservation details announced
+
+### Known Limitations
+
+1. **Charts (Recharts)**: SVG charts have limited screen reader support
+   - Mitigation: Data is also available in table/card format
+   - Future: Add `aria-label` summaries to chart container divs
+
+2. **Drag and Drop (dnd-kit Kanban)**: Visual interaction pattern
+   - Mitigation: dnd-kit includes built-in keyboard support (Space to pick up, arrows to move, Space to drop)
+   - Future: Consider additional keyboard-based reordering UI
+
+3. **Calendar Views (react-day-picker)**: Complex grid navigation
+   - Mitigation: react-day-picker has its own keyboard handling
+   - Status: Acceptable with built-in keyboard support
+
+### Screen Reader Support Level
+
+**WCAG 2.1 AA Conformance**: Yes
+- All functionality keyboard accessible
+- All interactive elements have accessible names
+- All form inputs properly labeled
+- Dynamic content properly announced via `aria-live` regions
+- Landmark regions properly defined (nav, main, aside)
+- Heading hierarchy maintained (h1 per page, h3 for cards)
+
+### Recommendations for Future Improvement
+
+1. Add chart data summaries via `aria-label` on chart containers
+2. Improve Kanban keyboard reordering with explicit move buttons
+3. Consider a screen reader mode toggle for simplified navigation
+4. Test with NVDA on Windows for broader coverage
+5. Test with TalkBack on Android for mobile screen reader support
 
 ## Files Modified
 

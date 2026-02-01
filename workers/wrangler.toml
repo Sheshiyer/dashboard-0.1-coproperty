@@ -14,6 +14,13 @@ id = "be7ca1853bb44067b6d3481b2133a64f"
 [vars]
 HOSPITABLE_BASE_URL = "https://public.api.hospitable.com/v2"
 TURNO_BASE_URL = "https://api.turno.com/v1"
+R2_PUBLIC_URL = "https://photos.coproperty.com"
+
+# R2 Buckets for photo storage
+[[r2_buckets]]
+binding = "PHOTOS"
+bucket_name = "coproperty-photos-dev"
+preview_bucket_name = "coproperty-photos-preview"
 
 # Secrets (set via wrangler secret put)
 # - HOSPITABLE_API_TOKEN

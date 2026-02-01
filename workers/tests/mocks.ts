@@ -153,6 +153,188 @@ export class MockKVNamespace implements KVNamespace {
 }
 
 // ============================================================================
+// Mock R2 Bucket
+// ============================================================================
+
+export class MockR2Bucket implements R2Bucket {
+    private store: Map<string, {
+        body: ArrayBuffer
+        httpMetadata?: R2HTTPMetadata
+        customMetadata?: Record<string, string>
+        key: string
+        size: number
+        uploaded: Date
+    }> = new Map()
+
+    async head(key: string): Promise<R2Object | null> {
+        const item = this.store.get(key)
+        if (!item) return null
+        return {
+            key: item.key,
+            size: item.size,
+            uploaded: item.uploaded,
+            httpMetadata: item.httpMetadata || {},
+            customMetadata: item.customMetadata || {},
+            version: 'v1',
+            etag: 'mock-etag',
+            httpEtag: '"mock-etag"',
+            checksums: { toJSON: () => ({}) },
+            storageClass: 'Standard' as R2StorageClass,
+            writeHttpMetadata: () => {},
+            range: undefined,
+        } as unknown as R2Object
+    }
+
+    async get(key: string, _options?: any): Promise<R2ObjectBody | null> {
+        const item = this.store.get(key)
+        if (!item) return null
+        const body = new ReadableStream({
+            start(controller) {
+                controller.enqueue(new Uint8Array(item.body))
+                controller.close()
+            }
+        })
+        return {
+            key: item.key,
+            size: item.size,
+            uploaded: item.uploaded,
+            httpMetadata: item.httpMetadata || {},
+            customMetadata: item.customMetadata || {},
+            version: 'v1',
+            etag: 'mock-etag',
+            httpEtag: '"mock-etag"',
+            checksums: { toJSON: () => ({}) },
+            storageClass: 'Standard' as R2StorageClass,
+            body,
+            bodyUsed: false,
+            arrayBuffer: async () => item.body,
+            text: async () => new TextDecoder().decode(item.body),
+            json: async () => JSON.parse(new TextDecoder().decode(item.body)),
+            blob: async () => new Blob([item.body]),
+            writeHttpMetadata: () => {},
+            range: undefined,
+        } as unknown as R2ObjectBody
+    }
+
+    async put(
+        key: string,
+        value: ReadableStream | ArrayBuffer | ArrayBufferView | string | null | Blob,
+        options?: R2PutOptions
+    ): Promise<R2Object> {
+        let body: ArrayBuffer
+        if (value instanceof ArrayBuffer) {
+            body = value
+        } else if (typeof value === 'string') {
+            body = new TextEncoder().encode(value).buffer as ArrayBuffer
+        } else if (value instanceof Blob) {
+            body = await value.arrayBuffer()
+        } else if (value instanceof ReadableStream) {
+            const reader = value.getReader()
+            const chunks: Uint8Array[] = []
+            let done = false
+            while (!done) {
+                const result = await reader.read()
+                done = result.done
+                if (result.value) chunks.push(result.value)
+            }
+            const totalLength = chunks.reduce((sum, chunk) => sum + chunk.length, 0)
+            const merged = new Uint8Array(totalLength)
+            let offset = 0
+            for (const chunk of chunks) {
+                merged.set(chunk, offset)
+                offset += chunk.length
+            }
+            body = merged.buffer as ArrayBuffer
+        } else {
+            body = new ArrayBuffer(0)
+        }
+
+        const item = {
+            body,
+            httpMetadata: options?.httpMetadata as R2HTTPMetadata | undefined,
+            customMetadata: options?.customMetadata,
+            key,
+            size: body.byteLength,
+            uploaded: new Date(),
+        }
+        this.store.set(key, item)
+
+        return {
+            key,
+            size: body.byteLength,
+            uploaded: item.uploaded,
+            httpMetadata: item.httpMetadata || {},
+            customMetadata: item.customMetadata || {},
+            version: 'v1',
+            etag: 'mock-etag',
+            httpEtag: '"mock-etag"',
+            checksums: { toJSON: () => ({}) },
+            storageClass: 'Standard' as R2StorageClass,
+            writeHttpMetadata: () => {},
+            range: undefined,
+        } as unknown as R2Object
+    }
+
+    async delete(keys: string | string[]): Promise<void> {
+        const keyArray = Array.isArray(keys) ? keys : [keys]
+        for (const key of keyArray) {
+            this.store.delete(key)
+        }
+    }
+
+    async list(options?: R2ListOptions): Promise<R2Objects> {
+        const prefix = options?.prefix || ''
+        const objects: R2Object[] = []
+
+        for (const [key, item] of this.store) {
+            if (key.startsWith(prefix)) {
+                objects.push({
+                    key,
+                    size: item.size,
+                    uploaded: item.uploaded,
+                    httpMetadata: item.httpMetadata || {},
+                    customMetadata: item.customMetadata || {},
+                    version: 'v1',
+                    etag: 'mock-etag',
+                    httpEtag: '"mock-etag"',
+                    checksums: { toJSON: () => ({}) },
+                    storageClass: 'Standard' as R2StorageClass,
+                    writeHttpMetadata: () => {},
+                    range: undefined,
+                } as unknown as R2Object)
+            }
+        }
+
+        return {
+            objects,
+            truncated: false,
+            delimitedPrefixes: [],
+        } as unknown as R2Objects
+    }
+
+    async createMultipartUpload(_key: string, _options?: R2MultipartOptions): Promise<R2MultipartUpload> {
+        throw new Error('Not implemented in mock')
+    }
+
+    async resumeMultipartUpload(_key: string, _uploadId: string): Promise<R2MultipartUpload> {
+        throw new Error('Not implemented in mock')
+    }
+
+    // Test utilities
+    clear(): void {
+        this.store.clear()
+    }
+
+    getStore(): Map<string, any> {
+        return this.store
+    }
+
+    getKeys(): string[] {
+        return Array.from(this.store.keys())
+    }
+}
+
+// ============================================================================
 // Mock Fetch for External APIs
 // ============================================================================
 
@@ -246,11 +428,13 @@ export function createMockEnv(overrides?: Partial<Bindings>): Bindings {
     return {
         CACHE: new MockKVNamespace(),
         TASKS: new MockKVNamespace(),
+        PHOTOS: new MockR2Bucket() as unknown as R2Bucket,
         HOSPITABLE_API_TOKEN: 'test-hospitable-token',
         TURNO_API_KEY: 'test-turno-key',
         API_KEY: 'test-api-key',
         HOSPITABLE_BASE_URL: 'https://test.hospitable.com/v2',
         TURNO_BASE_URL: 'https://test.turno.com/v1',
+        R2_PUBLIC_URL: 'https://test-photos.coproperty.com',
         ...overrides,
     }
 }
