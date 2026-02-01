@@ -1,0 +1,691 @@
+{
+  "schema_version": "1.0",
+  "project": {
+    "name": "Co.Property Operations Dashboard",
+    "repo_root": "/Volumes/madara/2026/Coproperty/dashboard-0.1",
+    "generated_on": "2026-01-29",
+    "generated_by": "task-master-planner",
+    "assumptions": [
+      "Cloudflare Workers and KV namespaces are available",
+      "Hospitable API access token is provided and valid",
+      "Turno API credentials are provided and valid",
+      "Frontend fetches data via Workers API endpoints",
+      "Simple API key authentication for initial version",
+      "DesignSpec.md is the source of truth for UI layouts and components",
+      "Engineering team uses Bun, Next.js 14 App Router, Tailwind, Zustand, React Query"
+    ],
+    "risks": [
+      "External API rate limits may require caching strategies",
+      "Hospitable/Turno API schema changes may break integrations",
+      "Workers KV eventual consistency may cause stale data in edge cases",
+      "No persistent database means no historical analytics without external storage"
+    ]
+  },
+  "phases": [
+    {
+      "phase_id": "P0",
+      "name": "Foundation & Architecture",
+      "status": "completed",
+      "objective": "Establish project scaffolding, architecture alignment, and platform readiness.",
+      "sprints": [
+        {
+          "sprint_id": "S1",
+          "duration_weeks": 1,
+          "focus": "Repo setup, architecture alignment, and platform foundations",
+          "tasks": [
+            {
+              "id": "P0-S1-01",
+              "title": "Confirm requirements and scope against DesignSpec and ProjectArchitecture",
+              "area": "product",
+              "owner_role": "Tech Lead",
+              "est_hours": 4,
+              "dependencies": [],
+              "deliverable": "Scope confirmation notes and feature checklist",
+              "acceptance": "Checklist maps every major feature to a sprint"
+            },
+            {
+              "id": "P0-S1-02",
+              "title": "Define codebase module boundaries and folder structure",
+              "area": "backend",
+              "owner_role": "Backend Eng",
+              "est_hours": 4,
+              "dependencies": [
+                "P0-S1-01"
+              ],
+              "deliverable": "Documented package/layout structure aligned with architecture patterns",
+              "acceptance": "Structure supports Workers API, frontend services, and UI separation"
+            },
+            {
+              "id": "P0-S1-03",
+              "title": "Configure Tailwind tokens from DesignSpec",
+              "area": "frontend",
+              "owner_role": "Frontend Eng",
+              "est_hours": 4,
+              "dependencies": [
+                "P0-S1-01"
+              ],
+              "deliverable": "Tailwind config with colors, typography, spacing, shadows",
+              "acceptance": "Tokens map to DesignSpec sections 2.x"
+            },
+            {
+              "id": "P0-S1-04",
+              "title": "Establish base Next.js App Router layout structure",
+              "area": "frontend",
+              "owner_role": "Frontend Eng",
+              "est_hours": 4,
+              "dependencies": [
+                "P0-S1-03"
+              ],
+              "deliverable": "Root layout with app shell placeholders",
+              "acceptance": "Layout renders sidebar/header slots"
+            },
+            {
+              "id": "P0-S1-05",
+              "title": "Establish linting, formatting, and basic CI pipeline",
+              "area": "infra",
+              "owner_role": "DevOps",
+              "est_hours": 4,
+              "dependencies": [
+                "P0-S1-01"
+              ],
+              "deliverable": "CI workflow running lint and tests on PRs",
+              "acceptance": "CI fails on lint/test violations"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "phase_id": "P1",
+      "name": "Cloudflare Workers & API Integrations",
+      "status": "in_progress",
+      "objective": "Build Cloudflare Workers backend with Hospitable and Turno API integrations.",
+      "sprints": [
+        {
+          "sprint_id": "S2",
+          "duration_weeks": 2,
+          "focus": "Workers setup, API clients, and caching layer",
+          "tasks": [
+            {
+              "id": "P1-S2-01",
+              "title": "Initialize Cloudflare Workers project with Hono",
+              "area": "backend",
+              "owner_role": "Backend Eng",
+              "est_hours": 6,
+              "dependencies": [
+                "P0-S1-02"
+              ],
+              "deliverable": "workers/ directory with wrangler.toml, Hono router skeleton",
+              "acceptance": "Worker deploys and returns hello world at /health"
+            },
+            {
+              "id": "P1-S2-02",
+              "title": "Configure Workers KV namespaces for caching",
+              "area": "infra",
+              "owner_role": "DevOps",
+              "est_hours": 4,
+              "dependencies": [
+                "P1-S2-01"
+              ],
+              "deliverable": "KV namespace bindings in wrangler.toml",
+              "acceptance": "Workers can read/write to KV"
+            },
+            {
+              "id": "P1-S2-03",
+              "title": "Implement Hospitable API client with rate limiting",
+              "area": "backend",
+              "owner_role": "Backend Eng",
+              "est_hours": 8,
+              "dependencies": [
+                "P1-S2-01"
+              ],
+              "deliverable": "TypeScript client for Hospitable v2 API",
+              "acceptance": "Client fetches properties and reservations successfully"
+            },
+            {
+              "id": "P1-S2-04",
+              "title": "Implement Turno API client",
+              "area": "backend",
+              "owner_role": "Backend Eng",
+              "est_hours": 8,
+              "dependencies": [
+                "P1-S2-01"
+              ],
+              "deliverable": "TypeScript client for Turno API",
+              "acceptance": "Client fetches cleaning jobs and updates status"
+            },
+            {
+              "id": "P1-S2-05",
+              "title": "Implement caching layer with KV",
+              "area": "backend",
+              "owner_role": "Backend Eng",
+              "est_hours": 6,
+              "dependencies": [
+                "P1-S2-02",
+                "P1-S2-03"
+              ],
+              "deliverable": "Cache wrapper with TTL support",
+              "acceptance": "API responses cached, invalidation works"
+            },
+            {
+              "id": "P1-S2-06",
+              "title": "Build /api/properties endpoint",
+              "area": "backend",
+              "owner_role": "Backend Eng",
+              "est_hours": 6,
+              "dependencies": [
+                "P1-S2-03",
+                "P1-S2-05"
+              ],
+              "deliverable": "GET /api/properties with filtering and pagination",
+              "acceptance": "Returns properties from Hospitable via cache"
+            },
+            {
+              "id": "P1-S2-07",
+              "title": "Build /api/reservations endpoint",
+              "area": "backend",
+              "owner_role": "Backend Eng",
+              "est_hours": 6,
+              "dependencies": [
+                "P1-S2-03",
+                "P1-S2-05"
+              ],
+              "deliverable": "GET /api/reservations with date filters",
+              "acceptance": "Returns reservations from Hospitable via cache"
+            },
+            {
+              "id": "P1-S2-08",
+              "title": "Build /api/cleaning endpoint",
+              "area": "backend",
+              "owner_role": "Backend Eng",
+              "est_hours": 6,
+              "dependencies": [
+                "P1-S2-04",
+                "P1-S2-05"
+              ],
+              "deliverable": "GET/PATCH /api/cleaning for jobs",
+              "acceptance": "Returns cleaning jobs from Turno, status updates work"
+            },
+            {
+              "id": "P1-S2-09",
+              "title": "Build /api/tasks endpoint with KV storage",
+              "area": "backend",
+              "owner_role": "Backend Eng",
+              "est_hours": 8,
+              "dependencies": [
+                "P1-S2-02"
+              ],
+              "deliverable": "CRUD endpoints for tasks stored in KV",
+              "acceptance": "Tasks persist in KV, CRUD works"
+            },
+            {
+              "id": "P1-S2-10",
+              "title": "Build /api/dashboard aggregation endpoint",
+              "area": "backend",
+              "owner_role": "Backend Eng",
+              "est_hours": 6,
+              "dependencies": [
+                "P1-S2-06",
+                "P1-S2-07",
+                "P1-S2-08",
+                "P1-S2-09"
+              ],
+              "deliverable": "GET /api/dashboard with stats",
+              "acceptance": "Returns aggregated counts for dashboard"
+            },
+            {
+              "id": "P1-S2-11",
+              "title": "Implement API key authentication middleware",
+              "area": "backend",
+              "owner_role": "Backend Eng",
+              "est_hours": 4,
+              "dependencies": [
+                "P1-S2-01"
+              ],
+              "deliverable": "Auth middleware checking API key header",
+              "acceptance": "Requests without valid API key return 401"
+            },
+            {
+              "id": "P1-S2-12",
+              "title": "Add request validation and error handling",
+              "area": "backend",
+              "owner_role": "Backend Eng",
+              "est_hours": 4,
+              "dependencies": [
+                "P1-S2-01"
+              ],
+              "deliverable": "Validation middleware and error mapper",
+              "acceptance": "All endpoints return consistent error format"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "phase_id": "P2",
+      "name": "Frontend Integration",
+      "status": "pending",
+      "objective": "Connect frontend to Workers API and remove legacy code.",
+      "sprints": [
+        {
+          "sprint_id": "S3",
+          "duration_weeks": 1,
+          "focus": "API client updates and data layer refactoring",
+          "tasks": [
+            {
+              "id": "P2-S3-01",
+              "title": "Create Workers API client for frontend",
+              "area": "frontend",
+              "owner_role": "Frontend Eng",
+              "est_hours": 6,
+              "dependencies": [
+                "P1-S2-10"
+              ],
+              "deliverable": "Typed API client calling Workers endpoints",
+              "acceptance": "Client supports auth headers and error mapping"
+            },
+            {
+              "id": "P2-S3-02",
+              "title": "Update properties data layer",
+              "area": "frontend",
+              "owner_role": "Frontend Eng",
+              "est_hours": 4,
+              "dependencies": [
+                "P2-S3-01"
+              ],
+              "deliverable": "Properties fetching via Workers API",
+              "acceptance": "getProperties() returns data from Workers"
+            },
+            {
+              "id": "P2-S3-03",
+              "title": "Update reservations data layer",
+              "area": "frontend",
+              "owner_role": "Frontend Eng",
+              "est_hours": 4,
+              "dependencies": [
+                "P2-S3-01"
+              ],
+              "deliverable": "Reservations fetching via Workers API",
+              "acceptance": "getReservations() returns data from Workers"
+            },
+            {
+              "id": "P2-S3-04",
+              "title": "Update cleaning jobs data layer",
+              "area": "frontend",
+              "owner_role": "Frontend Eng",
+              "est_hours": 4,
+              "dependencies": [
+                "P2-S3-01"
+              ],
+              "deliverable": "Cleaning fetching via Workers API",
+              "acceptance": "getCleaningJobs() returns data from Workers"
+            },
+            {
+              "id": "P2-S3-05",
+              "title": "Update tasks data layer",
+              "area": "frontend",
+              "owner_role": "Frontend Eng",
+              "est_hours": 4,
+              "dependencies": [
+                "P2-S3-01"
+              ],
+              "deliverable": "Tasks CRUD via Workers API",
+              "acceptance": "Task operations work through Workers"
+            },
+            {
+              "id": "P2-S3-06",
+              "title": "Update dashboard data layer",
+              "area": "frontend",
+              "owner_role": "Frontend Eng",
+              "est_hours": 4,
+              "dependencies": [
+                "P2-S3-01"
+              ],
+              "deliverable": "Dashboard stats from Workers API",
+              "acceptance": "getDashboardStats() returns aggregated data"
+            },
+            {
+              "id": "P2-S3-07",
+              "title": "Update middleware for new auth approach",
+              "area": "frontend",
+              "owner_role": "Frontend Eng",
+              "est_hours": 4,
+              "dependencies": [
+                "P1-S2-11"
+              ],
+              "deliverable": "Middleware using API key or session",
+              "acceptance": "Protected routes work with new auth"
+            },
+            {
+              "id": "P2-S3-08",
+              "title": "Remove legacy Supabase references",
+              "area": "frontend",
+              "owner_role": "Frontend Eng",
+              "est_hours": 4,
+              "dependencies": [
+                "P2-S3-06"
+              ],
+              "deliverable": "Codebase free of Supabase imports",
+              "acceptance": "No Supabase references in src/"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "phase_id": "P3",
+      "name": "Frontend & UX",
+      "status": "completed",
+      "objective": "Deliver UI foundation and all feature pages per DesignSpec.",
+      "sprints": [
+        {
+          "sprint_id": "S4",
+          "duration_weeks": 2,
+          "focus": "Frontend foundation, shared components, and auth",
+          "tasks": [
+            {
+              "id": "P3-S4-01",
+              "title": "Implement app shell with sidebar and header navigation",
+              "area": "frontend",
+              "owner_role": "Frontend Eng",
+              "est_hours": 8,
+              "dependencies": [
+                "P0-S1-04"
+              ],
+              "deliverable": "Responsive app shell with navigation slots",
+              "acceptance": "Sidebar items reflect DesignSpec nav structure"
+            },
+            {
+              "id": "P3-S4-02",
+              "title": "Wire API client with React Query",
+              "area": "frontend",
+              "owner_role": "Frontend Eng",
+              "est_hours": 6,
+              "dependencies": [
+                "P2-S3-01"
+              ],
+              "deliverable": "Query/mutation setup with caching defaults",
+              "acceptance": "Queries share standardized error handling"
+            },
+            {
+              "id": "P3-S4-03",
+              "title": "Implement global UI state with Zustand",
+              "area": "frontend",
+              "owner_role": "Frontend Eng",
+              "est_hours": 4,
+              "dependencies": [
+                "P0-S1-04"
+              ],
+              "deliverable": "Stores for filters, modals, and UI state",
+              "acceptance": "State shared across pages without prop drilling"
+            },
+            {
+              "id": "P3-S4-04",
+              "title": "Build button, input, select, and form components",
+              "area": "frontend",
+              "owner_role": "Frontend Eng",
+              "est_hours": 8,
+              "dependencies": [
+                "P0-S1-03"
+              ],
+              "deliverable": "Reusable form components with variants",
+              "acceptance": "Components match DesignSpec and UI patterns"
+            },
+            {
+              "id": "P3-S4-05",
+              "title": "Build data table and list components",
+              "area": "frontend",
+              "owner_role": "Frontend Eng",
+              "est_hours": 8,
+              "dependencies": [
+                "P3-S4-04"
+              ],
+              "deliverable": "Data table with sorting and pagination UI",
+              "acceptance": "Tables support empty/loading states"
+            },
+            {
+              "id": "P3-S4-06",
+              "title": "Build card, badge, and stat components",
+              "area": "frontend",
+              "owner_role": "Frontend Eng",
+              "est_hours": 6,
+              "dependencies": [
+                "P3-S4-04"
+              ],
+              "deliverable": "Cards and badges for dashboard and boards",
+              "acceptance": "Components match DesignSpec tokens"
+            },
+            {
+              "id": "P3-S4-07",
+              "title": "Implement modal and dialog system",
+              "area": "frontend",
+              "owner_role": "Frontend Eng",
+              "est_hours": 6,
+              "dependencies": [
+                "P3-S4-04"
+              ],
+              "deliverable": "Modal framework with accessibility support",
+              "acceptance": "Focus trap and ESC to close are supported"
+            },
+            {
+              "id": "P3-S4-08",
+              "title": "Add toast and notification UI pattern",
+              "area": "frontend",
+              "owner_role": "Frontend Eng",
+              "est_hours": 4,
+              "dependencies": [
+                "P3-S4-04"
+              ],
+              "deliverable": "Toast system for success/error messages",
+              "acceptance": "Notifications appear on mutation results"
+            }
+          ]
+        },
+        {
+          "sprint_id": "S5",
+          "duration_weeks": 2,
+          "focus": "Feature pages per DesignSpec",
+          "tasks": [
+            {
+              "id": "P3-S5-01",
+              "title": "Implement Dashboard Home page",
+              "area": "frontend",
+              "owner_role": "Frontend Eng",
+              "est_hours": 10,
+              "dependencies": [
+                "P3-S4-05",
+                "P2-S3-06"
+              ],
+              "deliverable": "Dashboard page with stats, operations, cleaning board, tasks",
+              "acceptance": "Dashboard matches DesignSpec 4.1 layout"
+            },
+            {
+              "id": "P3-S5-02",
+              "title": "Implement Properties list page with filters",
+              "area": "frontend",
+              "owner_role": "Frontend Eng",
+              "est_hours": 8,
+              "dependencies": [
+                "P2-S3-02",
+                "P3-S4-05"
+              ],
+              "deliverable": "Properties list with search and filter controls",
+              "acceptance": "Filters update query results and pagination"
+            },
+            {
+              "id": "P3-S5-03",
+              "title": "Implement Reservations page",
+              "area": "frontend",
+              "owner_role": "Frontend Eng",
+              "est_hours": 8,
+              "dependencies": [
+                "P2-S3-03",
+                "P3-S4-05"
+              ],
+              "deliverable": "Reservations calendar and list view",
+              "acceptance": "Date navigation and filters work"
+            },
+            {
+              "id": "P3-S5-04",
+              "title": "Implement Cleaning Board page",
+              "area": "frontend",
+              "owner_role": "Frontend Eng",
+              "est_hours": 8,
+              "dependencies": [
+                "P2-S3-04",
+                "P3-S4-06"
+              ],
+              "deliverable": "Kanban-style cleaning board",
+              "acceptance": "Status transitions work with drag/drop"
+            },
+            {
+              "id": "P3-S5-05",
+              "title": "Implement Tasks page",
+              "area": "frontend",
+              "owner_role": "Frontend Eng",
+              "est_hours": 8,
+              "dependencies": [
+                "P2-S3-05",
+                "P3-S4-05"
+              ],
+              "deliverable": "Tasks list with CRUD actions",
+              "acceptance": "Create, edit, complete, delete work"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "phase_id": "P4",
+      "name": "Testing & Verification",
+      "status": "pending",
+      "objective": "Ensure quality through comprehensive testing.",
+      "sprints": [
+        {
+          "sprint_id": "S6",
+          "duration_weeks": 1,
+          "focus": "Testing and verification",
+          "tasks": [
+            {
+              "id": "P4-S6-01",
+              "title": "Add Workers unit tests",
+              "area": "qa",
+              "owner_role": "QA",
+              "est_hours": 8,
+              "dependencies": [
+                "P1-S2-10"
+              ],
+              "deliverable": "Unit tests for API clients and endpoints",
+              "acceptance": "Coverage > 80% for Workers code"
+            },
+            {
+              "id": "P4-S6-02",
+              "title": "Update frontend data layer tests",
+              "area": "qa",
+              "owner_role": "QA",
+              "est_hours": 6,
+              "dependencies": [
+                "P2-S3-06"
+              ],
+              "deliverable": "Tests using Workers API mocks",
+              "acceptance": "Existing tests pass with new API layer"
+            },
+            {
+              "id": "P4-S6-03",
+              "title": "Manual E2E verification",
+              "area": "qa",
+              "owner_role": "QA",
+              "est_hours": 8,
+              "dependencies": [
+                "P3-S5-05"
+              ],
+              "deliverable": "Test report for all user flows",
+              "acceptance": "All critical paths pass manually"
+            },
+            {
+              "id": "P4-S6-04",
+              "title": "Performance testing",
+              "area": "qa",
+              "owner_role": "QA",
+              "est_hours": 4,
+              "dependencies": [
+                "P4-S6-01"
+              ],
+              "deliverable": "Response time benchmarks",
+              "acceptance": "p95 latency < 500ms for all endpoints"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "phase_id": "P5",
+      "name": "Deployment & Operations",
+      "status": "pending",
+      "objective": "Production deployment and monitoring.",
+      "sprints": [
+        {
+          "sprint_id": "S7",
+          "duration_weeks": 1,
+          "focus": "Production readiness",
+          "tasks": [
+            {
+              "id": "P5-S7-01",
+              "title": "Configure production Workers deployment",
+              "area": "infra",
+              "owner_role": "DevOps",
+              "est_hours": 4,
+              "dependencies": [
+                "P4-S6-03"
+              ],
+              "deliverable": "Production wrangler config with secrets",
+              "acceptance": "Workers deployed to production namespace"
+            },
+            {
+              "id": "P5-S7-02",
+              "title": "Set up Cloudflare Analytics",
+              "area": "infra",
+              "owner_role": "DevOps",
+              "est_hours": 4,
+              "dependencies": [
+                "P5-S7-01"
+              ],
+              "deliverable": "Analytics dashboard for Workers",
+              "acceptance": "Request metrics visible in CF dashboard"
+            },
+            {
+              "id": "P5-S7-03",
+              "title": "Configure production secrets",
+              "area": "infra",
+              "owner_role": "DevOps",
+              "est_hours": 2,
+              "dependencies": [
+                "P5-S7-01"
+              ],
+              "deliverable": "API keys and tokens in CF secrets",
+              "acceptance": "Workers can access external APIs"
+            },
+            {
+              "id": "P5-S7-04",
+              "title": "Deploy frontend to Vercel/CF Pages",
+              "area": "infra",
+              "owner_role": "DevOps",
+              "est_hours": 4,
+              "dependencies": [
+                "P5-S7-01"
+              ],
+              "deliverable": "Frontend deployed to production",
+              "acceptance": "Dashboard accessible at production URL"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "summary": {
+    "total_tasks": 54,
+    "total_hours": 282,
+    "phases": 6,
+    "sprints": 7
+  }
+}
