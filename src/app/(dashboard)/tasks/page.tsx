@@ -4,6 +4,9 @@ import { getProperties } from "@/lib/data/properties"
 import { DataTable } from "@/components/ui/data-table"
 import { columns } from "./columns"
 import { CreateTaskDialog } from "@/components/tasks/create-task-dialog"
+import { TaskTableSkeleton } from "@/components/skeleton/tasks-skeleton"
+import { EmptyState } from "@/components/ui/empty-state"
+import { CheckSquare } from "lucide-react"
 
 export default async function TasksPage() {
     const tasks = await getTasks()
@@ -18,8 +21,17 @@ export default async function TasksPage() {
 
             <div className="rounded-xl border bg-card shadow">
                 <div className="p-6">
-                    <Suspense fallback={<div className="h-24 w-full bg-muted/20 animate-pulse rounded" />}>
-                        <DataTable columns={columns} data={tasks} />
+                    <Suspense fallback={<TaskTableSkeleton />}>
+                        {tasks && tasks.length > 0 ? (
+                            <DataTable columns={columns} data={tasks} />
+                        ) : (
+                            <EmptyState
+                                icon={CheckSquare}
+                                title="No tasks assigned"
+                                description="Create your first task to start tracking work across your properties. Tasks help you stay organized and ensure nothing falls through the cracks."
+                                actionLabel="Create Task"
+                            />
+                        )}
                     </Suspense>
                 </div>
             </div>

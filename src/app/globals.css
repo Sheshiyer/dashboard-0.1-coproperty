@@ -175,3 +175,25 @@
     @apply backdrop-blur-lg bg-white/90 dark:bg-gray-900/90 border border-gray-200/60 dark:border-gray-700/60 shadow-xl;
   }
 }
+
+/* ============================================================================
+ * Reduced Motion - Accessibility Support
+ *
+ * Respects the user's OS-level "Reduce Motion" preference.
+ * macOS: System Settings > Accessibility > Display > Reduce Motion
+ * Windows: Settings > Ease of Access > Display > Show animations
+ *
+ * When enabled, all CSS animations and transitions are effectively disabled
+ * by reducing their duration to near-zero. This prevents vestibular
+ * discomfort for users with motion sensitivities.
+ * ============================================================================ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

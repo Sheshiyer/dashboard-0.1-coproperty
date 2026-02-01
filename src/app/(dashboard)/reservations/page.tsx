@@ -1,6 +1,8 @@
+import { Suspense } from "react"
 import { getReservations } from "@/lib/data/reservations"
 import { getProperties } from "@/lib/data/properties"
 import { ReservationsContent } from "./reservations-content"
+import { ReservationsSkeleton } from "@/components/skeleton/reservations-skeleton"
 
 export default async function ReservationsPage() {
     const [reservations, properties] = await Promise.all([
@@ -14,10 +16,12 @@ export default async function ReservationsPage() {
                 <h1 className="text-3xl font-bold tracking-tight">Reservations</h1>
             </div>
 
-            <ReservationsContent
-                reservations={reservations}
-                properties={properties}
-            />
+            <Suspense fallback={<ReservationsSkeleton />}>
+                <ReservationsContent
+                    reservations={reservations}
+                    properties={properties}
+                />
+            </Suspense>
         </div>
     )
 }

@@ -1,6 +1,7 @@
 import { Sidebar } from "@/components/layout/Sidebar";
 import { Header } from "@/components/layout/Header";
 import { DashboardAutoRefresh } from "@/components/dashboard/dashboard-auto-refresh";
+import { CommandPalette } from "@/components/layout/command-palette";
 
 export default function DashboardLayout({
     children,
@@ -18,6 +19,7 @@ export default function DashboardLayout({
                     </main>
                 </div>
             </div>
+            <CommandPalette />
         </DashboardAutoRefresh>
     );
 }
