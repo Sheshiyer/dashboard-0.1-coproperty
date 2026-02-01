@@ -4,11 +4,10 @@
  * bun test does not natively support jsdom, so we mock the browser globals
  * (window, navigator) directly in each test.
  */
-import { describe, it, expect, beforeEach, afterEach, mock, type Mock } from "bun:test"
+import { describe, it, expect, beforeEach, mock, type Mock } from "bun:test"
 
 // Set up minimal browser globals BEFORE importing the module under test
 const mockLocation = { href: "http://localhost:3000/dashboard" }
-const mockNavigator: Record<string, unknown> = { userAgent: "bun-test-agent" }
 
 // @ts-expect-error -- setting up minimal browser env for bun test
 globalThis.window = { location: mockLocation }
