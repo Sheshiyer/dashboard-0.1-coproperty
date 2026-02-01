@@ -22,6 +22,7 @@ import {
 import { Textarea } from "@/components/ui/textarea"
 import { DatePicker } from "@/components/ui/date-picker"
 import { createTask } from "@/lib/actions/tasks"
+import { trackEvent } from "@/lib/analytics"
 import { Property } from "@/lib/data/properties"
 import { Plus } from "lucide-react"
 import { useState } from "react"
@@ -37,6 +38,10 @@ export function CreateTaskDialog({ properties }: { properties: Property[] }) {
             formData.set("due_date", dueDate.toISOString())
         }
         await createTask(formData)
+        trackEvent("task_created", {
+            priority: formData.get("priority") as string,
+            category: formData.get("category") as string,
+        })
         setIsLoading(false)
         setOpen(false)
         setDueDate(undefined)

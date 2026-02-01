@@ -116,6 +116,7 @@ function AlertItem({ alert, onDismiss }: AlertItemProps) {
         >
             <GlassCard
                 intensity="light"
+                role="alert"
                 className={`p-4 border-l-4 ${config.borderColor}`}
             >
                 <div className="flex items-start gap-3">
@@ -191,7 +192,7 @@ export function AlertsBanner() {
     if (visibleAlerts.length === 0) return null
 
     return (
-        <div className="space-y-3" id="alerts">
+        <div className="space-y-3" id="alerts" role="region" aria-label="Dashboard alerts" aria-live="polite">
             <AnimatePresence mode="popLayout">
                 {visibleAlerts.map((alert) => (
                     <AlertItem

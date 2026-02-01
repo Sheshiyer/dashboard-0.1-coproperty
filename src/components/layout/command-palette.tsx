@@ -20,6 +20,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { trackEvent } from "@/lib/analytics";
 import { useCommandPaletteStore } from "@/stores/command-palette-store";
 import { useHotkeys } from "@/hooks/use-hotkeys";
 
@@ -231,11 +232,12 @@ export function CommandPalette() {
     setSelectedIndex(0);
   }, [query]);
 
-  // Focus input when opened
+  // Focus input when opened; track analytics event
   React.useEffect(() => {
     if (isOpen) {
       setQuery("");
       setSelectedIndex(0);
+      trackEvent("command_palette_opened");
       setTimeout(() => inputRef.current?.focus(), 50);
     }
   }, [isOpen]);

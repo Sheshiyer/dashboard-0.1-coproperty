@@ -1,7 +1,7 @@
 import { Suspense } from "react"
+import { dehydrate, HydrationBoundary, QueryClient } from "@tanstack/react-query"
 import { SyncButton } from "@/components/dashboard/sync-button"
 import { KpiStatsGrid } from "@/components/dashboard/kpi-stats-grid"
-import { ActivityFeed } from "@/components/dashboard/activity-feed"
 import { OccupancyChart } from "@/components/dashboard/occupancy-chart"
 import { BookingSourcesChart } from "@/components/dashboard/booking-sources-chart"
 import { RevenueChart } from "@/components/dashboard/revenue-chart"
@@ -10,14 +10,46 @@ import { CleaningSchedule } from "@/components/dashboard/cleaning-schedule"
 import { UpcomingCheckIns } from "@/components/dashboard/upcoming-check-ins"
 import { TaskPriorityMatrix } from "@/components/dashboard/task-priority-matrix"
 import { AlertsBanner } from "@/components/dashboard/alerts-banner"
+import { ActivityFeed } from "@/components/dashboard/activity-feed"
 import { KpiCardsSkeleton } from "@/components/skeleton/dashboard-skeleton"
+import { Skeleton } from "@/components/ui/skeleton"
+import { queryKeys } from "@/lib/query-client"
+import { getProperties } from "@/lib/data/properties"
+import { getUpcomingCheckIns, getDashboardStats, getTodayCleaning } from "@/lib/data/dashboard"
 
 // ============================================================================
 // Dashboard Page
+// Server-side prefetching hydrates the React Query cache so client components
+// have data immediately without a loading flash on first render.
 // ============================================================================
 
 export default async function DashboardPage() {
+    // Create a fresh QueryClient per request to avoid cross-request cache leaks
+    const serverQueryClient = new QueryClient()
+
+    // Prefetch critical dashboard data in parallel on the server.
+    // Using allSettled so one failed prefetch does not block others.
+    await Promise.allSettled([
+        serverQueryClient.prefetchQuery({
+            queryKey: queryKeys.properties.all(),
+            queryFn: getProperties,
+        }),
+        serverQueryClient.prefetchQuery({
+            queryKey: queryKeys.dashboard.upcomingCheckIns(),
+            queryFn: () => getUpcomingCheckIns(50),
+        }),
+        serverQueryClient.prefetchQuery({
+            queryKey: queryKeys.dashboard.stats(),
+            queryFn: getDashboardStats,
+        }),
+        serverQueryClient.prefetchQuery({
+            queryKey: queryKeys.dashboard.todayCleaning(),
+            queryFn: getTodayCleaning,
+        }),
+    ])
+
     return (
+    <HydrationBoundary state={dehydrate(serverQueryClient)}>
         <div className="space-y-6">
             {/* ============================================================ */}
             {/* Section 1: Alert Notifications Banner - Full Width Top       */}
@@ -64,8 +96,12 @@ export default async function DashboardPage() {
                 aria-label="Primary charts"
                 className="grid grid-cols-1 lg:grid-cols-2 gap-6"
             >
-                <OccupancyChart />
-                <RevenueChart />
+                <Suspense fallback={<Skeleton className="h-80 w-full rounded-xl" />}>
+                    <OccupancyChart />
+                </Suspense>
+                <Suspense fallback={<Skeleton className="h-80 w-full rounded-xl" />}>
+                    <RevenueChart />
+                </Suspense>
             </section>
 
             {/* ============================================================ */}
@@ -77,8 +113,12 @@ export default async function DashboardPage() {
                 aria-label="Secondary charts"
                 className="grid grid-cols-1 lg:grid-cols-2 gap-6"
             >
-                <BookingSourcesChart />
-                <PropertyPerformanceChart />
+                <Suspense fallback={<Skeleton className="h-80 w-full rounded-xl" />}>
+                    <BookingSourcesChart />
+                </Suspense>
+                <Suspense fallback={<Skeleton className="h-80 w-full rounded-xl" />}>
+                    <PropertyPerformanceChart />
+                </Suspense>
             </section>
 
             {/* ============================================================ */}
@@ -91,9 +131,15 @@ export default async function DashboardPage() {
                 aria-label="Activity and timelines"
                 className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
             >
-                <ActivityFeed />
-                <UpcomingCheckIns />
-                <CleaningSchedule />
+                <Suspense fallback={<Skeleton className="h-64 w-full rounded-xl" />}>
+                    <ActivityFeed />
+                </Suspense>
+                <Suspense fallback={<Skeleton className="h-64 w-full rounded-xl" />}>
+                    <UpcomingCheckIns />
+                </Suspense>
+                <Suspense fallback={<Skeleton className="h-64 w-full rounded-xl" />}>
+                    <CleaningSchedule />
+                </Suspense>
             </section>
 
             {/* ============================================================ */}
@@ -101,8 +147,11 @@ export default async function DashboardPage() {
             {/* Task: P7-S9-10                                               */}
             {/* ============================================================ */}
             <section aria-label="Priority matrix">
-                <TaskPriorityMatrix />
+                <Suspense fallback={<Skeleton className="h-64 w-full rounded-xl" />}>
+                    <TaskPriorityMatrix />
+                </Suspense>
             </section>
         </div>
+    </HydrationBoundary>
     )
 }

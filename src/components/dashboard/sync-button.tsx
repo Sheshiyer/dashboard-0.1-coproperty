@@ -24,9 +24,9 @@ export function SyncButton() {
     }
 
     return (
-        <Button onClick={handleSync} disabled={isSyncing} variant="outline" size="sm">
-            <RefreshCw className={`mr-2 h-4 w-4 ${isSyncing ? "animate-spin" : ""}`} />
-            {isSyncing ? "Syncing..." : "Sync Now"}
+        <Button onClick={handleSync} disabled={isSyncing} variant="outline" size="sm" aria-label={isSyncing ? "Syncing data" : "Sync data now"}>
+            <RefreshCw className={`mr-2 h-4 w-4 ${isSyncing ? "animate-spin" : ""}`} aria-hidden="true" />
+            <span aria-live="polite">{isSyncing ? "Syncing..." : "Sync Now"}</span>
         </Button>
     )
 }

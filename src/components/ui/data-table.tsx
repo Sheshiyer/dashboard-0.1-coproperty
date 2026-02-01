@@ -80,12 +80,13 @@ export function DataTable<TData, TValue>({
                     </TableBody>
                 </Table>
             </div>
-            <div className="flex items-center justify-end space-x-2 py-4">
+            <nav aria-label="Table pagination" className="flex items-center justify-end space-x-2 py-4">
                 <Button
                     variant="outline"
                     size="sm"
                     onClick={() => table.previousPage()}
                     disabled={!table.getCanPreviousPage()}
+                    aria-label="Go to previous page"
                 >
                     Previous
                 </Button>
@@ -94,10 +95,11 @@ export function DataTable<TData, TValue>({
                     size="sm"
                     onClick={() => table.nextPage()}
                     disabled={!table.getCanNextPage()}
+                    aria-label="Go to next page"
                 >
                     Next
                 </Button>
-            </div>
+            </nav>
         </div>
     )
 }

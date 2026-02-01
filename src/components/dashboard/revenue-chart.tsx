@@ -1,6 +1,16 @@
+import dynamic from "next/dynamic"
 import { format, parseISO } from "date-fns"
 import { getRevenueTrends } from "@/lib/data/dashboard"
-import { RevenueChartClient } from "./revenue-chart-client"
+import { Skeleton } from "@/components/ui/skeleton"
+
+// Dynamically import the recharts-heavy client component to reduce initial JS
+const RevenueChartClient = dynamic(
+    () => import("./revenue-chart-client").then(m => ({ default: m.RevenueChartClient })),
+    {
+        loading: () => <Skeleton className="h-80 w-full rounded-xl" />,
+        ssr: false,
+    }
+)
 
 // ============================================================================
 // RevenueChart Server Component

@@ -1,5 +1,15 @@
+import dynamic from "next/dynamic"
 import { getPropertyPerformance } from "@/lib/data/dashboard"
-import { PropertyPerformanceChartClient } from "./property-performance-chart-client"
+import { Skeleton } from "@/components/ui/skeleton"
+
+// Dynamically import the recharts-heavy client component to reduce initial JS
+const PropertyPerformanceChartClient = dynamic(
+    () => import("./property-performance-chart-client").then(m => ({ default: m.PropertyPerformanceChartClient })),
+    {
+        loading: () => <Skeleton className="h-80 w-full rounded-xl" />,
+        ssr: false,
+    }
+)
 
 // ============================================================================
 // PropertyPerformanceChart Component - Server Component (fetches data)

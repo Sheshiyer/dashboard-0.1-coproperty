@@ -1,5 +1,15 @@
+import dynamic from "next/dynamic"
 import { getBookingSources } from "@/lib/data/dashboard"
-import { BookingSourcesChartClient } from "./booking-sources-chart-client"
+import { Skeleton } from "@/components/ui/skeleton"
+
+// Dynamically import the recharts-heavy client component to reduce initial JS
+const BookingSourcesChartClient = dynamic(
+    () => import("./booking-sources-chart-client").then(m => ({ default: m.BookingSourcesChartClient })),
+    {
+        loading: () => <Skeleton className="h-80 w-full rounded-xl" />,
+        ssr: false,
+    }
+)
 
 // ============================================================================
 // BookingSourcesChart Component (Server Component)

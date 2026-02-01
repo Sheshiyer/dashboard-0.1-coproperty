@@ -87,6 +87,7 @@ export function MobileNav() {
                 setIsOpen(false);
                 setTimeout(() => openCommandPalette(), 200);
               }}
+              aria-label="Open search (Command K)"
               className={cn(
                 "flex w-full items-center gap-2 rounded-lg border border-input bg-background px-3 py-2 text-sm text-muted-foreground",
                 "hover:bg-muted/50 transition-colors",
@@ -101,7 +102,7 @@ export function MobileNav() {
           </div>
 
           {/* Navigation Links */}
-          <nav className="flex-1 overflow-y-auto px-3 py-4">
+          <nav aria-label="Mobile navigation" className="flex-1 overflow-y-auto px-3 py-4">
             <div className="grid gap-1">
               {navItems.map((item) => {
                 const Icon = item.icon;
@@ -113,6 +114,7 @@ export function MobileNav() {
                   <Link
                     key={item.href}
                     href={item.href}
+                    aria-current={isActive ? "page" : undefined}
                     className={cn(
                       "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all hover:text-primary",
                       isActive

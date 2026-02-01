@@ -184,6 +184,7 @@ export function TaskDetailSidebar() {
                                                     size="sm"
                                                     variant="ghost"
                                                     onClick={() => setIsEditing(false)}
+                                                    aria-label="Cancel editing"
                                                 >
                                                     <X className="h-4 w-4" />
                                                 </Button>
@@ -191,6 +192,7 @@ export function TaskDetailSidebar() {
                                                     size="sm"
                                                     onClick={handleSave}
                                                     loading={isSaving}
+                                                    aria-label="Save task changes"
                                                 >
                                                     <Save className="h-4 w-4 mr-1" />
                                                     Save
@@ -202,6 +204,7 @@ export function TaskDetailSidebar() {
                                                     size="sm"
                                                     variant="ghost"
                                                     onClick={() => setIsEditing(true)}
+                                                    aria-label="Edit task"
                                                 >
                                                     <Edit3 className="h-4 w-4" />
                                                 </Button>
@@ -211,6 +214,7 @@ export function TaskDetailSidebar() {
                                                     className="text-destructive hover:text-destructive"
                                                     onClick={handleDelete}
                                                     loading={isSaving}
+                                                    aria-label="Delete task"
                                                 >
                                                     <Trash2 className="h-4 w-4" />
                                                 </Button>

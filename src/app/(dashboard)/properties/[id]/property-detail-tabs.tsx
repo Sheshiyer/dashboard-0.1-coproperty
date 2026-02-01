@@ -1,7 +1,9 @@
 "use client"
 
+import dynamic from "next/dynamic"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { GlassCard } from "@/components/ui/glass"
+import { Skeleton } from "@/components/ui/skeleton"
 import {
   LayoutDashboard,
   CalendarDays,
@@ -12,13 +14,40 @@ import {
 } from "lucide-react"
 import type { PropertyWithDetails } from "@/types/api"
 import { PropertyInfoCards } from "@/components/properties/property-info-cards"
-import { ReservationCalendar } from "@/components/properties/reservation-calendar"
-import { ReservationTimeline } from "@/components/properties/reservation-timeline"
-import { RevenueAnalytics } from "@/components/properties/revenue-analytics"
-import { OccupancyAnalytics } from "@/components/properties/occupancy-analytics"
-import { CleaningHistory } from "@/components/properties/cleaning-history"
-import { TaskHistory } from "@/components/properties/task-history"
-import { PropertyNotes } from "@/components/properties/property-notes"
+
+// ---------------------------------------------------------------------------
+// Dynamic imports for tab content - each tab's heavy component loads on demand
+// Only the overview tab (PropertyInfoCards) is statically imported since it
+// is the default visible tab. All other tabs lazy-load when selected.
+// ---------------------------------------------------------------------------
+const ReservationCalendar = dynamic(
+    () => import("@/components/properties/reservation-calendar").then(m => ({ default: m.ReservationCalendar })),
+    { loading: () => <Skeleton className="h-64 w-full rounded-xl" />, ssr: false }
+)
+const ReservationTimeline = dynamic(
+    () => import("@/components/properties/reservation-timeline").then(m => ({ default: m.ReservationTimeline })),
+    { loading: () => <Skeleton className="h-48 w-full rounded-xl" />, ssr: false }
+)
+const RevenueAnalytics = dynamic(
+    () => import("@/components/properties/revenue-analytics").then(m => ({ default: m.RevenueAnalytics })),
+    { loading: () => <Skeleton className="h-64 w-full rounded-xl" />, ssr: false }
+)
+const OccupancyAnalytics = dynamic(
+    () => import("@/components/properties/occupancy-analytics").then(m => ({ default: m.OccupancyAnalytics })),
+    { loading: () => <Skeleton className="h-64 w-full rounded-xl" />, ssr: false }
+)
+const CleaningHistory = dynamic(
+    () => import("@/components/properties/cleaning-history").then(m => ({ default: m.CleaningHistory })),
+    { loading: () => <Skeleton className="h-64 w-full rounded-xl" />, ssr: false }
+)
+const TaskHistory = dynamic(
+    () => import("@/components/properties/task-history").then(m => ({ default: m.TaskHistory })),
+    { loading: () => <Skeleton className="h-64 w-full rounded-xl" />, ssr: false }
+)
+const PropertyNotes = dynamic(
+    () => import("@/components/properties/property-notes").then(m => ({ default: m.PropertyNotes })),
+    { loading: () => <Skeleton className="h-48 w-full rounded-xl" />, ssr: false }
+)
 
 interface PropertyDetailTabsProps {
   property: PropertyWithDetails

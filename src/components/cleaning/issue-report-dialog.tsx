@@ -352,7 +352,8 @@ export function IssueReportDialog({
                                         />
                                         <button
                                             onClick={() => removePhoto(idx)}
-                                            className="absolute -top-1.5 -right-1.5 bg-error-500 text-white rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity"
+                                            aria-label={`Remove photo ${idx + 1}`}
+                                            className="absolute -top-1.5 -right-1.5 bg-error-500 text-white rounded-full p-0.5 opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity"
                                         >
                                             <X className="h-3 w-3" />
                                         </button>
@@ -367,6 +368,8 @@ export function IssueReportDialog({
                             multiple
                             onChange={handleFileSelect}
                             className="hidden"
+                            aria-label="Upload issue photos"
+                            tabIndex={-1}
                         />
                         <Button
                             variant="outline"

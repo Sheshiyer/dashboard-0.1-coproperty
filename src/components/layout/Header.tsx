@@ -107,6 +107,7 @@ export function Header() {
                 {/* Command Palette Trigger (search bar) */}
                 <button
                     onClick={openCommandPalette}
+                    aria-label="Open search (Command K)"
                     className={cn(
                         "relative hidden w-full max-w-sm md:flex items-center",
                         "rounded-md border border-input bg-background px-3 py-2 text-sm",
@@ -127,8 +128,12 @@ export function Header() {
                 <ThemeToggle />
 
                 {/* User Avatar Placeholder */}
-                <div className="h-8 w-8 rounded-full bg-primary/20 border border-primary/10 flex items-center justify-center">
-                    <span className="text-xs font-semibold text-primary">US</span>
+                <div
+                    role="img"
+                    aria-label="User avatar"
+                    className="h-8 w-8 rounded-full bg-primary/20 border border-primary/10 flex items-center justify-center"
+                >
+                    <span className="text-xs font-semibold text-primary" aria-hidden="true">US</span>
                 </div>
             </div>
         </header>

@@ -149,7 +149,14 @@ export function ChecklistProgress({ checklist, compact = false, className }: Che
     if (compact) {
         return (
             <div className={cn("flex items-center gap-1.5", className)}>
-                <div className="h-1.5 w-12 rounded-full bg-muted overflow-hidden">
+                <div
+                    role="progressbar"
+                    aria-valuenow={percent}
+                    aria-valuemin={0}
+                    aria-valuemax={100}
+                    aria-label={`${percent}% complete`}
+                    className="h-1.5 w-12 rounded-full bg-muted overflow-hidden"
+                >
                     <div
                         className={cn(
                             "h-full rounded-full transition-all duration-300",
@@ -162,7 +169,7 @@ export function ChecklistProgress({ checklist, compact = false, className }: Che
                         style={{ width: `${percent}%` }}
                     />
                 </div>
-                <span className="text-[10px] text-muted-foreground tabular-nums">
+                <span className="text-[10px] text-muted-foreground tabular-nums" aria-hidden="true">
                     {percent}%
                 </span>
             </div>
@@ -177,7 +184,14 @@ export function ChecklistProgress({ checklist, compact = false, className }: Che
                 </span>
                 <span className="font-medium">{percent}%</span>
             </div>
-            <div className="h-2 w-full rounded-full bg-muted overflow-hidden">
+            <div
+                role="progressbar"
+                aria-valuenow={percent}
+                aria-valuemin={0}
+                aria-valuemax={100}
+                aria-label={`Checklist progress: ${completed} of ${total} tasks completed`}
+                className="h-2 w-full rounded-full bg-muted overflow-hidden"
+            >
                 <div
                     className={cn(
                         "h-full rounded-full transition-all duration-500",
@@ -269,7 +283,7 @@ export function CleaningChecklistDialog({
                 </div>
 
                 {/* Category Tabs */}
-                <div className="flex gap-2 overflow-x-auto pb-1 px-1">
+                <div role="tablist" aria-label="Checklist categories" className="flex gap-2 overflow-x-auto pb-1 px-1">
                     {checklist.map((cat) => {
                         const catCompleted = cat.items.filter((i) => i.checked).length
                         const catTotal = cat.items.length
@@ -278,6 +292,9 @@ export function CleaningChecklistDialog({
                         return (
                             <button
                                 key={cat.id}
+                                role="tab"
+                                aria-selected={isActive}
+                                aria-controls="checklist-items-panel"
                                 onClick={() => setActiveCategory(cat.id)}
                                 className={cn(
                                     "flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium transition-all whitespace-nowrap",
@@ -301,7 +318,7 @@ export function CleaningChecklistDialog({
                 </div>
 
                 {/* Checklist Items */}
-                <div className="flex-1 overflow-y-auto space-y-2 px-1 min-h-0">
+                <div id="checklist-items-panel" role="tabpanel" aria-label={activeCat?.name ?? "Checklist items"} className="flex-1 overflow-y-auto space-y-2 px-1 min-h-0">
                     {activeCat?.items.map((item) => (
                         <GlassCard
                             key={item.id}
@@ -316,6 +333,7 @@ export function CleaningChecklistDialog({
                                 checked={item.checked}
                                 onCheckedChange={() => toggleItem(activeCategory, item.id)}
                                 onClick={(e) => e.stopPropagation()}
+                                aria-label={item.label}
                             />
                             <span
                                 className={cn(

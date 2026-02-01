@@ -1,17 +1,37 @@
 "use client"
 
 import * as React from "react"
+import dynamic from "next/dynamic"
 import { motion } from "framer-motion"
 import { LayoutGrid, Table2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { useTaskStore } from "@/lib/stores/task-store"
 import { TaskFilterBar } from "./task-filter-bar"
-import { TaskDataTable } from "./task-data-table"
-import { PriorityMatrixView } from "./priority-matrix-view"
 import { TaskDetailSidebar } from "./task-detail-sidebar"
 import { columns } from "@/app/(dashboard)/tasks/columns"
+import { TaskTableSkeleton } from "@/components/skeleton/tasks-skeleton"
+import { Skeleton } from "@/components/ui/skeleton"
 import type { Task, Property } from "@/types/api"
+
+// ---------------------------------------------------------------------------
+// Dynamic imports - @tanstack/react-table and PriorityMatrixView are heavy
+// and only one is active at a time (table or matrix view).
+// ---------------------------------------------------------------------------
+const TaskDataTable = dynamic(
+    () => import("./task-data-table").then(m => ({ default: m.TaskDataTable })),
+    {
+        loading: () => <TaskTableSkeleton />,
+        ssr: false,
+    }
+)
+const PriorityMatrixView = dynamic(
+    () => import("./priority-matrix-view").then(m => ({ default: m.PriorityMatrixView })),
+    {
+        loading: () => <Skeleton className="h-96 w-full rounded-xl" />,
+        ssr: false,
+    }
+)
 
 interface TasksPageClientProps {
     tasks: Task[]

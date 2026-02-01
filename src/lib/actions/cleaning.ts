@@ -2,6 +2,7 @@
 
 import { apiClient } from "@/lib/api-client"
 import { revalidatePath } from "next/cache"
+import { revalidateTag } from "next/cache"
 
 export async function updateCleaningJobStatus(
     jobId: string,
@@ -13,6 +14,7 @@ export async function updateCleaningJobStatus(
             body: { status }
         })
         revalidatePath("/cleaning")
+        revalidateTag("cleaning-jobs")
         return { success: true }
     } catch (error) {
         console.error("Error updating cleaning status:", error)

@@ -22,6 +22,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { trackEvent } from "@/lib/analytics";
 import {
   useNotificationsStore,
   type NotificationType,
@@ -58,7 +59,9 @@ export function NotificationsDropdown() {
   const unreadCount = useNotificationsStore((s) => s.unreadCount());
 
   return (
-    <DropdownMenu>
+    <DropdownMenu onOpenChange={(open) => {
+      if (open) trackEvent("notifications_viewed", { unreadCount })
+    }}>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" size="icon" className="relative">
           <Bell className="h-5 w-5" />
@@ -163,24 +166,26 @@ export function NotificationsDropdown() {
                   <div className="flex shrink-0 gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                     {!notification.read && (
                       <button
-                        className="rounded p-1 hover:bg-muted"
+                        className="rounded p-1 hover:bg-muted focus:opacity-100 focus-visible:ring-2 focus-visible:ring-ring"
                         onClick={(e) => {
                           e.preventDefault();
                           e.stopPropagation();
                           markAsRead(notification.id);
                         }}
+                        aria-label={`Mark "${notification.title}" as read`}
                         title="Mark as read"
                       >
                         <Check className="h-3 w-3 text-muted-foreground" />
                       </button>
                     )}
                     <button
-                      className="rounded p-1 hover:bg-muted"
+                      className="rounded p-1 hover:bg-muted focus:opacity-100 focus-visible:ring-2 focus-visible:ring-ring"
                       onClick={(e) => {
                         e.preventDefault();
                         e.stopPropagation();
                         removeNotification(notification.id);
                       }}
+                      aria-label={`Dismiss "${notification.title}"`}
                       title="Dismiss"
                     >
                       <X className="h-3 w-3 text-muted-foreground" />

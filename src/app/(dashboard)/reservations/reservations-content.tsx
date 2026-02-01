@@ -1,18 +1,30 @@
 "use client"
 
 import { Suspense, useState, useMemo } from "react"
+import dynamic from "next/dynamic"
 import {
   ReservationFilters,
   useReservationFilters,
 } from "@/components/reservations/reservation-filters"
 import { ReservationSearch } from "@/components/reservations/reservation-search"
-import { ReservationList } from "@/components/reservations/reservation-list"
 import { ReservationCalendarSkeleton } from "@/components/skeleton/reservations-skeleton"
 import { EmptyState } from "@/components/ui/empty-state"
+import { Skeleton } from "@/components/ui/skeleton"
 import { CalendarDays } from "lucide-react"
 import type { Reservation, Property } from "@/types/api"
 import { filterReservations } from "@/lib/utils/reservation-filters"
 import { searchReservations } from "@/lib/utils/reservation-search"
+
+// ---------------------------------------------------------------------------
+// Dynamic import for the heavy reservation list component
+// ---------------------------------------------------------------------------
+const ReservationList = dynamic(
+    () => import("@/components/reservations/reservation-list").then(m => ({ default: m.ReservationList })),
+    {
+        loading: () => <Skeleton className="h-96 w-full rounded-xl" />,
+        ssr: false,
+    }
+)
 
 interface ReservationsContentProps {
   reservations: Reservation[]

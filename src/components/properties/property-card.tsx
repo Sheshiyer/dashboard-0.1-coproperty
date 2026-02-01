@@ -8,6 +8,7 @@ import { GlassCard } from "@/components/ui/glass"
 import { Badge } from "@/components/ui/badge"
 import { Checkbox } from "@/components/ui/checkbox"
 import { cn } from "@/lib/utils"
+import { trackEvent } from "@/lib/analytics"
 import type { PropertyCardData, PropertyStatus } from "@/types/property"
 import { STATUS_CONFIG } from "@/types/property"
 import { PropertyActionsMenu, type PropertyAction } from "./property-actions-menu"
@@ -261,6 +262,7 @@ export function PropertyCard({ property, loading, className, onAction, isSelecte
     <Link
       href={`/properties/${id}`}
       className={cn("block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 rounded-lg", className)}
+      onClick={() => trackEvent("property_viewed", { propertyId: id })}
     >
       {cardContent}
     </Link>

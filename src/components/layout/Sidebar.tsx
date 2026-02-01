@@ -63,6 +63,7 @@ export function Sidebar({ className }: SidebarProps) {
 
     return (
         <aside
+            aria-label="Sidebar navigation"
             className={cn(
                 "relative hidden h-screen border-r bg-card transition-[width] duration-300 ease-in-out md:flex",
                 isOpen ? "w-72" : "w-20",
@@ -90,7 +91,7 @@ export function Sidebar({ className }: SidebarProps) {
 
                 {/* Navigation */}
                 <div className="flex-1 overflow-y-auto py-4">
-                    <nav className="grid gap-1 px-2">
+                    <nav aria-label="Main navigation" className="grid gap-1 px-2">
                         {navItems.map((item, index) => {
                             const Icon = item.icon;
                             const isActive = pathname === item.href || (item.href !== "/" && pathname?.startsWith(item.href));
@@ -99,6 +100,7 @@ export function Sidebar({ className }: SidebarProps) {
                                 <Link
                                     key={index}
                                     href={item.href}
+                                    aria-current={isActive ? "page" : undefined}
                                     className={cn(
                                         "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all hover:text-primary",
                                         isActive
@@ -107,6 +109,7 @@ export function Sidebar({ className }: SidebarProps) {
                                         !isOpen && "justify-center px-2"
                                     )}
                                     title={!isOpen ? item.title : undefined}
+                                    aria-label={!isOpen ? item.title : undefined}
                                 >
                                     <Icon className={cn("h-5 w-5", isActive && "text-primary")} />
                                     {isOpen && <span>{item.title}</span>}
